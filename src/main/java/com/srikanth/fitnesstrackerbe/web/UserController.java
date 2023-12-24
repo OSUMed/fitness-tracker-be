@@ -104,10 +104,9 @@ public class UserController {
     
     @PostMapping("/logout")
     public ResponseEntity<LogoutResponse> logoutUser(@RequestBody User user, HttpServletResponse response) {
-        User loggedInUser = (User) userService.loadUserByUsername(user.getUsername());
 
         // Invalidate refresh token in the database
-        refreshTokenService.deleteRefreshToken(loggedInUser);
+        refreshTokenService.deleteRefreshTokenByUsername(user.getUsername());
 
         // Clear refresh token cookie using CookieUtils
         ResponseCookie refreshTokenCookie = CookieUtils.clearCookie("refreshToken");
@@ -126,5 +125,9 @@ public class UserController {
 	@GetMapping("/getusers")
 	public List<User> getUsers() {
 		return userService.getAllUsers();
+	}
+	@GetMapping("/test")
+	public String testEnd() {
+		return "This is the test endpoint holla";
 	}
 }
