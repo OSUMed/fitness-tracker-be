@@ -56,10 +56,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter implements App
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 	        throws ServletException, IOException {
+//		if (true) {
+//			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//			logger.info("Writing response TRUE e2 message...");
+//	        response.getWriter().write("{\"error\":\"DAED TEST Unauthorized access. Please log in again.\"}");
+//	        return;
+//		}
 	    String authHeader = request.getHeader("Authorization");
+	    Cookie refreshTokenCookie = findCookie(request, "refreshToken");
 	    if (StringUtils.hasText(authHeader)) {
 	        String accessToken = authHeader.substring(7);
-	        Cookie refreshTokenCookie = findCookie(request, "refreshToken");
 	        
 	        if (accessToken != null) {
 	            try {
@@ -77,34 +83,42 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter implements App
 	            } catch (Exception e) {
 	                // General unauthorized error
 	                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+	                response.setHeader("Authorization-Error", "true");
 	                response.getWriter().write("{\"error\":\"Unauthorized access. Please log in again.\"}");
 	                return;
 	            }
 	        }
-	        filterChain.doFilter(request, response);
-	    }
+	    } 
+	    filterChain.doFilter(request, response);
 	}
 
 	private void handleAccessTokenExpiration(HttpServletResponse response, Cookie refreshTokenCookie) throws IOException {
 	    try {
-	        String newToken = refreshAccessToken(refreshTokenCookie);
+ 	        String newToken = refreshAccessToken(refreshTokenCookie);
 	        response.setHeader("Authorization-Refresh", newToken); // Set new token in response
 	        setAuthenticationInContext(jwtService.getSubject(newToken));
-	    } catch (ExpiredJwtException e1) {
-	        // Handle expired refresh token
-	    	 String username = e1.getClaims().getSubject();
-	        refreshTokenService.deleteRefreshTokenByUsername(username);
-	        Cookie clearCookie = CookieUtils.clearServletCookie("refreshToken");
-	        response.addCookie(clearCookie);
+	    } catch (IllegalArgumentException e2) {
+	        if (e2.getMessage().startsWith("Refresh Token has expired for user: ")) {
+	            String username = e2.getMessage().split("user: ")[1];
+	 	        refreshTokenService.deleteRefreshTokenByUsername(username);
+	 	        Cookie clearCookie = CookieUtils.clearServletCookie("refreshToken");
+	 	        response.addCookie(clearCookie);
 
-	        // Return a 401 response with the redirectToLogin flag
-	        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-	        response.setContentType("application/json");
-	        response.getWriter().write("{\"error\":\"Session expired. Please log in again.\", \"redirectToLogin\":true}");
+	 	        // Return a 401 response with the redirectToLogin flag
+	 	        response.setHeader("Refresh-Token-Expired", "true");
+	 	        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+	 	        response.setContentType("application/json");
+	 	        logger.info("Writing response IllegalArgumentException e2 message...");
+	 	        response.getWriter().write("{\"error\":\"Session expired. Please log in again.\", \"redirectToLogin\":true}");
+	 	       return;
+	        }
 	    } catch (Exception e1) {
 	        // Other exceptions during token refresh
+	    	logger.info("Writing response Exception e1 message...");
+	    	response.setHeader("Authorization-Error", "true");
 	        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 	        response.getWriter().write("{\"error\":\"Error processing token. Please log in again.\"}");
+	        return;
 	    }
 	}
 

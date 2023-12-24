@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.srikanth.fitnesstrackerbe.domain.Product;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
 public class ProductController {
 
     private List<Product> allProducts = new ArrayList<>();
@@ -35,6 +34,7 @@ public class ProductController {
     }
     @GetMapping("/free")
     public ResponseEntity<List<Product>> getFree () {
+    	System.out.println("We reached free endpoint!");
     	return ResponseEntity.ok( allProducts );
     }
     @GetMapping("/free2")

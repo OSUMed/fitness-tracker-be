@@ -2,37 +2,22 @@ package com.srikanth.fitnesstrackerbe.security;
 
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
+
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.stream.Collectors;
 
-import org.springframework.security.core.Authentication;
-
-import com.srikanth.fitnesstrackerbe.domain.RefreshToken;
-import com.srikanth.fitnesstrackerbe.domain.User;
-import com.srikanth.fitnesstrackerbe.repository.AuthorityRepository;
-import com.srikanth.fitnesstrackerbe.repository.UserRepository;
-import com.srikanth.fitnesstrackerbe.service.JwtService;
-import com.srikanth.fitnesstrackerbe.service.RefreshTokenService;
-import com.srikanth.fitnesstrackerbe.service.UserService;
 
 
 @Configuration
@@ -40,12 +25,13 @@ import com.srikanth.fitnesstrackerbe.service.UserService;
 public class SecurityConfiguration {
 	@Autowired
 	private JwtAuthenticationFilter jwtAuthenticationFilter;
-	@Autowired
-	private JwtService jwtService;
-	@Autowired
-	private RefreshTokenService refreshTokenService;
-	@Autowired
-	private UserService userService;
+	 private final UserDetailsService userDetailsService;
+
+    @Autowired
+    public SecurityConfiguration(@Qualifier("userDetailsServiceImpl") UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
+
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -53,15 +39,11 @@ public class SecurityConfiguration {
 		return new BCryptPasswordEncoder();
 	}
 
-	// User Details Service: Load user by user name:
-	@Bean
-	public UserDetailsService userDetailsService() {
-		return userService;
-	}
+
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-	    String[] pathsPermitAll = { "/api/v1/users", "/allusers", "/api/v1/users/**", "/h2-console/**", "/free", "/signup" };
+	    String[] pathsPermitAll = { "/api/v1/users", "/actuator/**", "/allusers", "/refreshtoken", "/tryme", "/api/v1/users/**", "/h2-console/**", "/free", "/register", "/login" };
 	    http.csrf(AbstractHttpConfigurer::disable)
 	        .authorizeHttpRequests(authz -> {
 	            for (String path : pathsPermitAll) {
@@ -74,6 +56,8 @@ public class SecurityConfiguration {
 	        })
 	        .headers(frameOptions -> frameOptions.disable())
 	        .authenticationProvider(authenticationProvider())
+	        .sessionManagement(sessionManagement -> 
+            sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 	        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 	
 
@@ -86,8 +70,51 @@ public class SecurityConfiguration {
 	public AuthenticationProvider authenticationProvider() {
 		DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
 		daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
-		daoAuthenticationProvider.setUserDetailsService(userDetailsService());
+		daoAuthenticationProvider.setUserDetailsService(userDetailsService);
 		return daoAuthenticationProvider;
 	}
 
 }
+//
+//package com.srikanth.fitnesstrackerbe.security;
+//
+//import org.springframework.context.annotation.Bean;
+//import org.springframework.context.annotation.Configuration;
+//import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+//import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+//import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+//import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+//import org.springframework.security.crypto.password.PasswordEncoder;
+//import org.springframework.security.web.SecurityFilterChain;
+//import org.springframework.security.web.csrf.CsrfFilter;
+//import org.springframework.web.filter.CorsFilter;
+//import org.springframework.web.cors.CorsConfigurationSource;
+//import org.springframework.security.config.Customizer;
+//
+//@Configuration
+//@EnableWebSecurity
+//public class SecurityConfigBackup {
+//
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
+//        http
+//            .addFilterBefore(new CorsFilter(corsConfigurationSource), CsrfFilter.class) // Add CorsFilter
+//            .csrf(csrf -> csrf.disable()) // Optionally disable CSRF
+//            .authorizeHttpRequests((authz) -> authz
+//        		.requestMatchers("/private/**").authenticated()
+//                .anyRequest().permitAll() // Require authentication for all requests
+//            )
+//            .httpBasic(Customizer.withDefaults()); // Enable HTTP Basic Authentication with default settings
+//
+//        return http.build();
+//    }
+//
+//    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+//        PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+//        auth.inMemoryAuthentication()
+//            .withUser("username")
+//            .password(encoder.encode("123"))
+//            .roles("USER");
+//    }
+//}
+//

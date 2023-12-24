@@ -24,7 +24,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 @Service
-@Primary
 public class UserService implements UserDetailsService {
 
 
