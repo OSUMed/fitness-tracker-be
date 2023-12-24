@@ -68,6 +68,11 @@ public class UserController {
 		System.out.println("This is the try me endpoint!");
 	    return ResponseEntity.ok("Endpoint reached");
 	}
+	@GetMapping("/user/hello")
+	public ResponseEntity<String> userEndpoints() {
+		System.out.println("Hello you reached user endpoint");
+	    return ResponseEntity.ok("User Endpoint reached");
+	}
     @PostMapping("/register")
     public ResponseEntity<RegisterationResponse> signUpUser (@RequestBody User user) {
     	User savedUser = userService.registerNewUser(user.getUsername(), user.getPassword());
