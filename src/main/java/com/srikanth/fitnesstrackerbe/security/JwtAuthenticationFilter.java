@@ -83,6 +83,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter implements App
 	            } catch (Exception e) {
 	                // General unauthorized error
 	                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+	                response.setHeader("Authorization-Error", "true");
 	                response.getWriter().write("{\"error\":\"Unauthorized access. Please log in again.\"}");
 	                return;
 	            }
@@ -96,18 +97,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter implements App
  	        String newToken = refreshAccessToken(refreshTokenCookie);
 	        response.setHeader("Authorization-Refresh", newToken); // Set new token in response
 	        setAuthenticationInContext(jwtService.getSubject(newToken));
-	    } catch (ExpiredJwtException e1) {
-	        // Handle expired refresh token
-	    	 String username = e1.getClaims().getSubject();
-	        refreshTokenService.deleteRefreshTokenByUsername(username);
-	        Cookie clearCookie = CookieUtils.clearServletCookie("refreshToken");
-	        response.addCookie(clearCookie);
-
-	        // Return a 401 response with the redirectToLogin flag
-	        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-	        response.setContentType("application/json");
-	        response.getWriter().write("{\"error\":\"Session expired. Please log in again.\", \"redirectToLogin\":true}");
-	        
 	    } catch (IllegalArgumentException e2) {
 	        if (e2.getMessage().startsWith("Refresh Token has expired for user: ")) {
 	            String username = e2.getMessage().split("user: ")[1];
@@ -116,15 +105,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter implements App
 	 	        response.addCookie(clearCookie);
 
 	 	        // Return a 401 response with the redirectToLogin flag
+	 	        response.setHeader("Refresh-Token-Expired", "true");
 	 	        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 	 	        response.setContentType("application/json");
-	 	       logger.info("Writing response IllegalArgumentException e2 message...");
+	 	        logger.info("Writing response IllegalArgumentException e2 message...");
 	 	        response.getWriter().write("{\"error\":\"Session expired. Please log in again.\", \"redirectToLogin\":true}");
 	 	       return;
 	        }
 	    } catch (Exception e1) {
 	        // Other exceptions during token refresh
 	    	logger.info("Writing response Exception e1 message...");
+	    	response.setHeader("Authorization-Error", "true");
 	        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 	        response.getWriter().write("{\"error\":\"Error processing token. Please log in again.\"}");
 	        return;
