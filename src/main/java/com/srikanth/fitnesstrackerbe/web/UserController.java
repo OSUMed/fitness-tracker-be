@@ -35,8 +35,7 @@ import org.springframework.http.ResponseEntity;
 import com.srikanth.fitnesstrackerbe.util.CookieUtils;
 
 @RestController
-@RequestMapping("/api/v1/users")
-@CrossOrigin(origins = "http://localhost:5173")
+//@CrossOrigin(origins = "http://localhost:5173")
 public class UserController {
 	private UserRepository userRepository;
 	private PasswordEncoder passwordEncoder;
@@ -63,7 +62,13 @@ public class UserController {
 //        
 //        return ResponseEntity.ok(savedUser);
 //    }
-    @PostMapping("")
+	
+	@GetMapping("/tryme")
+	public ResponseEntity<String> tryme() {
+		System.out.println("This is the try me endpoint!");
+	    return ResponseEntity.ok("Endpoint reached");
+	}
+    @PostMapping("/register")
     public ResponseEntity<RegisterationResponse> signUpUser (@RequestBody User user) {
     	User savedUser = userService.registerNewUser(user.getUsername(), user.getPassword());
     	RegisterationResponse regResponse = new RegisterationResponse(savedUser.getUsername());

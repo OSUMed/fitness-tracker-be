@@ -11,7 +11,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -43,7 +43,7 @@ public class SecurityConfiguration {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-	    String[] pathsPermitAll = { "/api/v1/users", "/allusers", "/api/v1/users/**", "/h2-console/**", "/free", "/signup", "/login" };
+	    String[] pathsPermitAll = { "/api/v1/users", "/actuator/**", "/allusers", "/refreshtoken", "/tryme", "/api/v1/users/**", "/h2-console/**", "/free", "/register", "/login" };
 	    http.csrf(AbstractHttpConfigurer::disable)
 	        .authorizeHttpRequests(authz -> {
 	            for (String path : pathsPermitAll) {
@@ -56,6 +56,8 @@ public class SecurityConfiguration {
 	        })
 	        .headers(frameOptions -> frameOptions.disable())
 	        .authenticationProvider(authenticationProvider())
+	        .sessionManagement(sessionManagement -> 
+            sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 	        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 	
 

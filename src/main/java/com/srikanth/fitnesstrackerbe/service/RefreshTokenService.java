@@ -80,13 +80,14 @@ public class RefreshTokenService {
     }
 
     
-    private static RefreshToken isNonExpired (RefreshToken refreshToken) {
+    private static RefreshToken isNonExpired(RefreshToken refreshToken) {
         if (refreshToken.getExpirationDate().after(new Date())) {
             return refreshToken;
         } else {
-            throw new IllegalArgumentException("Refresh Token has expired");
+            throw new IllegalArgumentException("Refresh Token has expired for user: " + refreshToken.getUser().getUsername());
         }
     }
+
 
 //    public void deleteRefreshToken(User loggedInUser) {
 //        Optional<RefreshToken> refreshTokenOpt = refreshTokenRepository.findById(loggedInUser.getId());
