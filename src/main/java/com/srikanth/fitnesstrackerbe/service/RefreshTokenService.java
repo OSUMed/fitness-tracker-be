@@ -7,7 +7,8 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.srikanth.fitnesstrackerbe.domain.RefreshToken;
 import com.srikanth.fitnesstrackerbe.domain.User;
 import com.srikanth.fitnesstrackerbe.repository.RefreshTokenRepository;
@@ -26,6 +27,7 @@ public class RefreshTokenService {
 		this.refreshTokenRepository = refreshTokenRepository;
 		this.jwtService = jwtService;
 	}
+	 private static final Logger logger = LoggerFactory.getLogger(RefreshTokenService.class);
 
 	// To ensure id is not null, if user in repo, then make refresh token.
 	// Save the new refresh token to our repo and then return the refresh token from
@@ -65,6 +67,19 @@ public class RefreshTokenService {
         
     }
     
+    /**
+     * Calculate the remaining time in milliseconds until the refresh token expires.
+     *
+     * @param refreshToken The refresh token for which to calculate the remaining time.
+     * @return The remaining time in milliseconds until the token expires.
+     */
+    public long getRemainingTimeForRefreshToken(RefreshToken refreshToken) {
+        long expirationTimeMillis = refreshToken.getExpirationDate().getTime();
+        long currentTimeMillis = System.currentTimeMillis();
+        return expirationTimeMillis - currentTimeMillis;
+    }
+
+    
     private static RefreshToken isNonExpired (RefreshToken refreshToken) {
         if (refreshToken.getExpirationDate().after(new Date())) {
             return refreshToken;
@@ -72,6 +87,26 @@ public class RefreshTokenService {
             throw new IllegalArgumentException("Refresh Token has expired");
         }
     }
+
+//    public void deleteRefreshToken(User loggedInUser) {
+//        Optional<RefreshToken> refreshTokenOpt = refreshTokenRepository.findById(loggedInUser.getId());
+//
+//        if (refreshTokenOpt.isPresent()) {
+//            RefreshToken refreshToken = refreshTokenOpt.get();
+//            refreshTokenRepository.delete(refreshToken);
+//        } 
+//    }
+    
+    public void deleteRefreshTokenByUsername(String username) {
+        refreshTokenRepository.findByUser_Username(username).ifPresent(refreshToken -> {
+            refreshTokenRepository.delete(refreshToken);
+            // Log the token deletion
+            logger.info("Deleted refresh token for user: {}", username);
+        });
+    }
+
+
+
     
     
 }
