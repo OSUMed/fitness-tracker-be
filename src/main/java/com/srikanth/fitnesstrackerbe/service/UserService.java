@@ -44,16 +44,21 @@ public class UserService implements UserDetailsService {
 		return userRepository.findAll();
 	}
 
-	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-	    User user = userRepository.findByUsername(username);
-	    if (user == null) {
-	        System.out.println("User not found with username: " + username);
-	        throw new UsernameNotFoundException("User not found");
-	    }
-	    System.out.println("User found: " + username + ", Authorities: " + user.getAuthorities());
-	    return user;
-	}
+   @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<User> userOpt = userRepository.findByUsername(username);
+        
+        // Check if the user was found
+        if (!userOpt.isPresent()) {
+            System.out.println("User not found with username: " + username);
+            throw new UsernameNotFoundException("User not found with username: " + username);
+        }
+
+        User user = userOpt.get(); 
+        
+        System.out.println("User found: " + username + ", Authorities: " + user.getAuthorities());
+        return user;
+    }
 
 
     public Optional<User> findById (Integer userId) {
@@ -64,7 +69,14 @@ public class UserService implements UserDetailsService {
         User user = new User(username, passwordEncoder.encode(password));
 
         // Find the authority by name
-        Authority authority = authorityRepository.findByName("ROLE_USER");
+        Optional<Authority> authorityOpt = authorityRepository.findByName("ROLE_USER");
+        
+        if (!authorityOpt.isPresent()) {
+            System.out.println("Authority not found: " + authorityOpt);
+            throw new IllegalStateException("Authority not found: " + authorityOpt);
+        }
+        
+        Authority authority = authorityOpt.get();
 
         // Set the selected authority
         user.setAuthorities(Collections.singletonList(authority));
