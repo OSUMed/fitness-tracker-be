@@ -1,5 +1,7 @@
 package com.srikanth.fitnesstrackerbe.service;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,11 +25,16 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
-        if (user == null) {
+        Optional<User> userOpt = userRepository.findByUsername(username);
+        
+        // Check if the user was found
+        if (!userOpt.isPresent()) {
             System.out.println("User not found with username: " + username);
-            throw new UsernameNotFoundException("User not found");
+            throw new UsernameNotFoundException("User not found with username: " + username);
         }
+
+        User user = userOpt.get(); 
+        
         System.out.println("User found: " + username + ", Authorities: " + user.getAuthorities());
         return user;
     }
