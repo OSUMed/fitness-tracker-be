@@ -2,7 +2,9 @@ package com.srikanth.fitnesstrackerbe.service;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 import javax.crypto.SecretKey;
@@ -10,6 +12,9 @@ import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
+import com.srikanth.fitnesstrackerbe.domain.RefreshToken;
+import com.srikanth.fitnesstrackerbe.domain.User;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Header;
@@ -91,5 +96,7 @@ public class JwtService {
         if (this.expirationTimeInMillis == null)
             this.expirationTimeInMillis = expirationTimeInMillis;
     }
+
+	
     
 }
