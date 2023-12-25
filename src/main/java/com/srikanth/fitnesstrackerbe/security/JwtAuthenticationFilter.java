@@ -1,5 +1,6 @@
 package com.srikanth.fitnesstrackerbe.security;
 
+import io.github.pixee.security.Newlines;
 import java.io.IOException;
 
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -95,7 +96,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter implements App
 	private void handleAccessTokenExpiration(HttpServletResponse response, Cookie refreshTokenCookie) throws IOException {
 	    try {
  	        String newToken = refreshAccessToken(refreshTokenCookie);
-	        response.setHeader("Authorization-Refresh", newToken); // Set new token in response
+	        response.setHeader("Authorization-Refresh", Newlines.stripAll(newToken)); // Set new token in response
 	        setAuthenticationInContext(jwtService.getSubject(newToken));
 	    } catch (IllegalArgumentException e2) {
 	        if (e2.getMessage().startsWith("Refresh Token has expired for user: ")) {
