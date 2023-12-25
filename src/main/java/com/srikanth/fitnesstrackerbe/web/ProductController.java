@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.srikanth.fitnesstrackerbe.domain.Product;
 
 @RestController
+@CrossOrigin(origins = "*")
 public class ProductController {
 
     private List<Product> allProducts = new ArrayList<>();

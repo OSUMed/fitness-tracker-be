@@ -33,9 +33,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import com.srikanth.fitnesstrackerbe.util.CookieUtils;
-
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 @RestController
-//@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "*")
 public class UserController {
 	private UserRepository userRepository;
 	private PasswordEncoder passwordEncoder;
@@ -71,8 +72,18 @@ public class UserController {
 	@GetMapping("/user/hello")
 	public ResponseEntity<String> userEndpoints() {
 		System.out.println("Hello you reached user endpoint");
-	    return ResponseEntity.ok("User Endpoint reached");
+		return ResponseEntity.ok("User Endpoint reached");
 	}
+
+	 @GetMapping("/account")
+	    public String currentUserName() {
+	        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	        if (authentication != null && authentication.isAuthenticated()) {
+	        	System.out.println("Who is user? " + authentication.getName());
+	            return authentication.getName();
+	        }
+	        return null; 
+	    }
     @PostMapping("/register")
     public ResponseEntity<RegisterationResponse> signUpUser (@RequestBody User user) {
     	User savedUser = userService.registerNewUser(user.getUsername(), user.getPassword());

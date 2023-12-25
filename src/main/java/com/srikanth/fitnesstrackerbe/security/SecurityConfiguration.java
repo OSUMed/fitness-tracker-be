@@ -43,7 +43,7 @@ public class SecurityConfiguration {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-	    String[] pathsPermitAll = { "/api/v1/users", "/actuator/**", "/allusers", "/refreshtoken", "/tryme", "/api/v1/users/**", "/h2-console/**", "/free", "/register", "/login" };
+	    String[] pathsPermitAll = { "/api/v1/users", "/logout", "/actuator/**", "/account", "/allusers", "/refreshtoken", "/tryme", "/api/v1/users/**", "/h2-console/**", "/free", "/register", "/login" };
 	    http.csrf(AbstractHttpConfigurer::disable)
 	        .authorizeHttpRequests(authz -> {
 	            for (String path : pathsPermitAll) {
