@@ -30,6 +30,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import com.srikanth.fitnesstrackerbe.util.CookieUtils;
@@ -127,17 +128,26 @@ public class UserController {
                 .body(authResponse);
     }
     
-    @PostMapping("/logout")
-    public ResponseEntity<LogoutResponse> logoutUser(@RequestBody User user, HttpServletResponse response) {
+    @PostMapping("/api/logout")
+    public ResponseEntity<LogoutResponse> logoutUser(HttpServletResponse response) {
+        // Get the currently authenticated user from the security context
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        // Invalidate refresh token in the database
-        refreshTokenService.deleteRefreshTokenByUsername(user.getUsername());
+        if (authentication != null) {
+            String username = authentication.getName();
 
-        // Clear refresh token cookie using CookieUtils
-        ResponseCookie refreshTokenCookie = CookieUtils.clearCookie("refreshToken");
-        response.setHeader("Set-Cookie", refreshTokenCookie.toString());
+            // Invalidate refresh token in the database
+            refreshTokenService.deleteRefreshTokenByUsername(username);
 
-        return ResponseEntity.ok(new LogoutResponse("Successfully logged out"));
+            // Clear refresh token cookie using CookieUtils
+            ResponseCookie refreshTokenCookie = CookieUtils.clearCookie("refreshToken");
+            response.setHeader("Set-Cookie", refreshTokenCookie.toString());
+
+            return ResponseEntity.ok(new LogoutResponse("Successfully logged out"));
+        } else {
+            // Handle the case when there is no authenticated user (optional)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LogoutResponse("Not authenticated"));
+        }
     }
 
 	@PostMapping("/refreshtoken")

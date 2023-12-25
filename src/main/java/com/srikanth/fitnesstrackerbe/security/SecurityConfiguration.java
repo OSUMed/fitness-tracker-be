@@ -44,7 +44,7 @@ public class SecurityConfiguration {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-	    String[] pathsPermitAll = { "/api/v1/users", "/logout", "/actuator/**", "/account", "/allusers", "/refreshtoken", "/tryme", "/api/v1/users/**", "/h2-console/**", "/free", "/register", "/login" };
+	    String[] pathsPermitAll = { "/api/v1/users", "/api/logout", "/actuator/**", "/account", "/allusers", "/refreshtoken", "/tryme", "/api/v1/users/**", "/h2-console/**", "/free", "/register", "/login" };
 	    http    // Apply CORS
 	        .cors(cors -> cors.configurationSource(corsConfigurationSource))
 	    	.csrf(AbstractHttpConfigurer::disable)
@@ -62,7 +62,6 @@ public class SecurityConfiguration {
 	        .sessionManagement(sessionManagement -> 
             sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 	        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-	
 
 	    return http.build();
 	}
