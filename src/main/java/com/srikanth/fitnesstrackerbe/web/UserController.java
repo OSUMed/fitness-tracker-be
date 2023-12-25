@@ -104,10 +104,14 @@ public class UserController {
         long remainingAge = refreshTokenService.getRemainingTimeForRefreshToken(refreshToken);
         
         // Create the refresh token cookie
-        ResponseCookie refreshTokenCookie = CookieUtils.createRefreshTokenCookie(
-            refreshToken.getRefreshToken(), 
-            remainingAge
-        );
+        String refreshTokenCookie = CookieUtils.createRefreshTokenCookie(
+                refreshToken.getRefreshToken(), 
+                remainingAge
+            );
+//        ResponseCookie refreshTokenCookie = CookieUtils.createRefreshTokenCookie(
+//            refreshToken.getRefreshToken(), 
+//            remainingAge
+//        );
 
         // Create the authentication response object
         AuthenticationResponse authResponse = new AuthenticationResponse(
@@ -118,9 +122,9 @@ public class UserController {
 
         // Build the response and add the refresh token cookie and access token to the headers
         return ResponseEntity.ok()
-                             .header("Set-Cookie", refreshTokenCookie.toString())
-                             .header("Authorization", "Bearer " + accessToken)
-                             .body(authResponse);
+                .header("Set-Cookie", refreshTokenCookie)
+                .header("Authorization", "Bearer " + accessToken)
+                .body(authResponse);
     }
     
     @PostMapping("/logout")

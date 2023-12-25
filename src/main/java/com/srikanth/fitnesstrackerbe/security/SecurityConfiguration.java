@@ -17,7 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
+import org.springframework.web.cors.CorsConfigurationSource;
 
 
 @Configuration
@@ -31,7 +31,8 @@ public class SecurityConfiguration {
     public SecurityConfiguration(@Qualifier("userDetailsServiceImpl") UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
-
+    @Autowired
+    private CorsConfigurationSource corsConfigurationSource;
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -44,7 +45,9 @@ public class SecurityConfiguration {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 	    String[] pathsPermitAll = { "/api/v1/users", "/logout", "/actuator/**", "/account", "/allusers", "/refreshtoken", "/tryme", "/api/v1/users/**", "/h2-console/**", "/free", "/register", "/login" };
-	    http.csrf(AbstractHttpConfigurer::disable)
+	    http    // Apply CORS
+	        .cors(cors -> cors.configurationSource(corsConfigurationSource))
+	    	.csrf(AbstractHttpConfigurer::disable)
 	        .authorizeHttpRequests(authz -> {
 	            for (String path : pathsPermitAll) {
 	                authz.requestMatchers(new AntPathRequestMatcher(path)).permitAll();

@@ -7,13 +7,21 @@ import jakarta.servlet.http.Cookie;
 public class CookieUtils {
 
     // Existing method for creating a refresh token cookie
-    public static ResponseCookie createRefreshTokenCookie(String value, long expiresIn) {
-        return ResponseCookie.from("refreshToken", value)
-                             .path("/")
-                             .httpOnly(true)
-                             .maxAge(expiresIn)
-                             .secure(true) // HTTPS
-                             .build();
+//    public static ResponseCookie createRefreshTokenCookie(String value, long expiresIn) {
+//        return ResponseCookie.from("refreshToken", value)
+//                             .path("/")
+//                             .httpOnly(true)
+//                             .maxAge(expiresIn)
+//                             .secure(false) // turn to true in production HTTPS
+//                             .build();
+//    }
+    public static String createRefreshTokenCookie(String value, long expiresIn) {
+        // Manually construct the Set-Cookie header value
+        return String.format(
+            "refreshToken=%s; Path=/; HttpOnly; Max-Age=%d; Secure; SameSite=None",
+            value,
+            expiresIn
+        );
     }
 
     // New method for clearing a cookie
@@ -22,7 +30,7 @@ public class CookieUtils {
                              .path("/")
                              .httpOnly(true)
                              .maxAge(0) // Expire the cookie immediately
-                             .secure(true) // HTTPS
+                             .secure(false) // HTTPS
                              .build();
     }
     public static Cookie clearServletCookie(String name) {
@@ -30,7 +38,7 @@ public class CookieUtils {
         cookie.setPath("/");
         cookie.setHttpOnly(true);
         cookie.setMaxAge(0); // Expire the cookie immediately
-        cookie.setSecure(true); // HTTPS
+        cookie.setSecure(false); // HTTPS
         return cookie;
     }
 }
