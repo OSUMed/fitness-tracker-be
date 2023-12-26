@@ -31,9 +31,15 @@ public class DataInitializer implements CommandLineRunner {
 
         Optional<User> adminUserOpt = userRepository.findByUsername("admin");
         if (!adminUserOpt.isPresent()) {
-            User adminUser = new User("admin", "encodedPassword"); 
-            adminUser.setAuthorities(new HashSet<>(Collections.singletonList(roleAdmin)));
-            userRepository.save(adminUser);
+        	User adminUser = new User("admin", "encodedPassword"); 
+        	adminUser.setAuthorities(new HashSet<>(Collections.singletonList(roleAdmin)));
+        	userRepository.save(adminUser);
+        }
+        Optional<User> guestUserOpt = userRepository.findByUsername("winter");
+        if (!guestUserOpt.isPresent()) {
+            User guestUser = new User("guest", "srikanth"); 
+            guestUser.setAuthorities(new HashSet<>(Collections.singletonList(roleUser)));
+            userRepository.save(guestUser);
         }
     }
 }
