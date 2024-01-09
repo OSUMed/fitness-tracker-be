@@ -5,19 +5,19 @@ import java.util.List;
 import java.util.Objects;
 
 public class TodaysWorkoutDTO {
-    private Long userId;
+    private Integer userId;
     private Date date;
     private List<ExerciseDTO> exercises;
 
     // Constructors
-    public TodaysWorkoutDTO(Long userId, Date date, List<ExerciseDTO> exercises) {
+    public TodaysWorkoutDTO(Integer userId, Date date, List<ExerciseDTO> exercises) {
         this.userId = userId;
         this.date = date;
         this.exercises = exercises;
     }
 
     // Getters
-    public Long getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
@@ -30,7 +30,7 @@ public class TodaysWorkoutDTO {
     }
 
     // Setters
-    public void setUserId(Long userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 

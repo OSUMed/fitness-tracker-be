@@ -4,9 +4,8 @@ import java.util.List;
 public class CardioExerciseDTO extends ExerciseDTO {
     private List<CardioSetDTO> cardioSets;
 
-	public CardioExerciseDTO(String type, String exerciseName, List<? extends ExerciseSetDTO> sets,
-			List<CardioSetDTO> cardioSets) {
-		super(type, exerciseName, sets);
+	public CardioExerciseDTO(String type, String exerciseName, List<CardioSetDTO> cardioSets) {
+		super(type, exerciseName, cardioSets);
 		this.cardioSets = cardioSets;
 	}
 

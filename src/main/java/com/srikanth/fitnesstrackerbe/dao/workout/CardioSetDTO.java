@@ -1,6 +1,6 @@
 package com.srikanth.fitnesstrackerbe.dao.workout;
 
-public class CardioSetDTO {
+public class CardioSetDTO extends ExerciseSetDTO{
     private String distance;
 
     public CardioSetDTO(String distance) {

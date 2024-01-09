@@ -1,5 +1,4 @@
 package com.srikanth.fitnesstrackerbe.dao.workout;
-
 import java.util.List;
 
 public class StretchExerciseDTO extends ExerciseDTO {

@@ -14,6 +14,35 @@ public abstract class ExerciseDTO {
         this.sets = sets;
     }
 
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getExerciseName() {
+		return exerciseName;
+	}
+
+	public void setExerciseName(String exerciseName) {
+		this.exerciseName = exerciseName;
+	}
+
+	public List<? extends ExerciseSetDTO> getSets() {
+		return sets;
+	}
+
+	public void setSets(List<? extends ExerciseSetDTO> sets) {
+		this.sets = sets;
+	}
+
+	@Override
+	public String toString() {
+		return "ExerciseDTO [type=" + type + ", exerciseName=" + exerciseName + ", sets=" + sets + "]";
+	}
+
    
    
 }
