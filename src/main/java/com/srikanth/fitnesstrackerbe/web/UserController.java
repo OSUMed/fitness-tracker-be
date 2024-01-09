@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.srikanth.fitnesstrackerbe.domain.RefreshToken;
 import com.srikanth.fitnesstrackerbe.domain.User;
@@ -79,13 +80,20 @@ public class UserController {
 	}
 
 	@GetMapping("/account")
-	public String currentUserName() {
+	public ResponseEntity<Map<String, Object>> currentUserNameAndId() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication != null && authentication.isAuthenticated()) {
-			System.out.println("Who is user? " + authentication.getName());
-			return authentication.getName();
+			String userName = authentication.getName();
+			User loggedInUser = (User) userService.loadUserByUsername(userName);
+			Integer userId = loggedInUser.getId();
+			System.out.println("Who is user? " + userName + userId);
+			Map<String, Object> accountDetails = new HashMap<>();
+			accountDetails.put("username", userName);
+			accountDetails.put("userId", userId);
+			System.out.println("Deets are: " + accountDetails);
+			return ResponseEntity.ok(accountDetails);
 		}
-		return null;
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 	}
 
 	@PostMapping("/register")
@@ -114,7 +122,7 @@ public class UserController {
 
 		// Create the authentication response object
 		AuthenticationResponse authResponse = new AuthenticationResponse(loggedInUser.getUsername(), accessToken,
-				refreshToken.getRefreshToken());
+				refreshToken.getRefreshToken(), loggedInUser.getId());
 
 		// Build the response and add the refresh token cookie and access token to the
 		// headers
