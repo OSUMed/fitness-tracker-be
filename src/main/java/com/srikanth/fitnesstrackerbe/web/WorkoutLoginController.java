@@ -45,7 +45,7 @@ public class WorkoutLoginController {
 //	}
 
 	@PostMapping("/workoutlogins")
-	public ResponseEntity<?> addWorkout(@RequestBody Map<String, Object> workoutData) {
+	public ResponseEntity<TodaysWorkoutDTO> addWorkout(@RequestBody Map<String, Object> workoutData) {
 	    System.out.println("Received workout data: " + workoutData);
 
 	    @SuppressWarnings("unchecked")
@@ -58,8 +58,9 @@ public class WorkoutLoginController {
 	    TodaysWorkoutDTO todaysWorkoutDTO = todayWorkoutService.processWorkoutData(workoutData);
         System.out.println("Mapped DTO: " + todaysWorkoutDTO);
 
-
-	    return ResponseEntity.ok("Workout data received");
+        // Then, add the exercise
+        TodaysWorkoutDTO updatedWorkout = todayWorkoutService.addExercise(todaysWorkoutDTO);
+        return ResponseEntity.ok(updatedWorkout);
 	}
 
 }

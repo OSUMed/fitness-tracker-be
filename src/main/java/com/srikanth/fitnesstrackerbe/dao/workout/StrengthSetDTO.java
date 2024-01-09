@@ -5,7 +5,6 @@ public class StrengthSetDTO extends ExerciseSetDTO {
 	private String weight;
 
 	public StrengthSetDTO(String reps, String weight) {
-		super();
 		this.reps = reps;
 		this.weight = weight;
 	}

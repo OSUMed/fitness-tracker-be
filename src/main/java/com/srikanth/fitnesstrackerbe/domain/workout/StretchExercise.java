@@ -1,6 +1,7 @@
 package com.srikanth.fitnesstrackerbe.domain.workout;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -8,18 +9,18 @@ import jakarta.persistence.OneToMany;
 import com.srikanth.fitnesstrackerbe.domain.User;
 
 @Entity
-public class Stretch extends Exercise {
+public class StretchExercise extends Exercise {
 
     @OneToMany(mappedBy = "stretch", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StretchSet> sets;
 
     // Constructors
-    public Stretch() {
+    public StretchExercise() {
         super();
     }
 
-    public Stretch(String name, User user, List<StretchSet> sets) {
-        super(name, user);
+    public StretchExercise(String name, User user, List<StretchSet> sets) {
+        super();
         this.sets = sets;
     }
 
@@ -28,8 +29,13 @@ public class Stretch extends Exercise {
         return sets;
     }
 
-    public void setSets(List<StretchSet> sets) {
-        this.sets = sets;
+    @Override
+    public void setSets(List<ExerciseSet> sets) {
+        // Need to ensure that the sets are indeed List<CardioSet> before assigning
+        this.sets = sets.stream()
+                        .filter(s -> s instanceof StretchSet)
+                        .map(s -> (StretchSet)s)
+                        .collect(Collectors.toList());
     }
 
     // toString method
@@ -37,7 +43,7 @@ public class Stretch extends Exercise {
     public String toString() {
         return "Stretch{" +
                 "id=" + getId() +
-                ", name='" + getName() + '\'' +
+                ", name='" + getExerciseName() + '\'' +
                 ", user=" + getUser() +
                 ", sets=" + sets +
                 '}';
