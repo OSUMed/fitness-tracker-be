@@ -33,7 +33,7 @@ public class ProductController {
     public String getOnlyAuth () {
     	return "Only for people who signed in";
     }
-    @GetMapping("/free")
+    @GetMapping("/srikanth")
     public ResponseEntity<List<Product>> getFree () {
     	System.out.println("We reached free endpoint!");
     	return ResponseEntity.ok( allProducts );

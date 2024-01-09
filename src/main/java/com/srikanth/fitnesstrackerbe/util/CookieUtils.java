@@ -6,15 +6,6 @@ import jakarta.servlet.http.Cookie;
 
 public class CookieUtils {
 
-    // Existing method for creating a refresh token cookie
-//    public static ResponseCookie createRefreshTokenCookie(String value, long expiresIn) {
-//        return ResponseCookie.from("refreshToken", value)
-//                             .path("/")
-//                             .httpOnly(true)
-//                             .maxAge(expiresIn)
-//                             .secure(false) // turn to true in production HTTPS
-//                             .build();
-//    }
     public static String createRefreshTokenCookie(String value, long expiresIn) {
         // Manually construct the Set-Cookie header value
         return String.format(
@@ -29,7 +20,7 @@ public class CookieUtils {
         return ResponseCookie.from(name, "")
                              .path("/")
                              .httpOnly(true)
-                             .maxAge(0) // Expire the cookie immediately
+                             .maxAge(0) 
                              .secure(false) // HTTPS
                              .build();
     }
@@ -37,7 +28,7 @@ public class CookieUtils {
         Cookie cookie = new Cookie(name, "");
         cookie.setPath("/");
         cookie.setHttpOnly(true);
-        cookie.setMaxAge(0); // Expire the cookie immediately
+        cookie.setMaxAge(0); 
         cookie.setSecure(false); // HTTPS
         return cookie;
     }
