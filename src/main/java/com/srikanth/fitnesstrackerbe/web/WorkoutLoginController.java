@@ -1,6 +1,7 @@
 package com.srikanth.fitnesstrackerbe.web;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -24,14 +25,30 @@ public class WorkoutLoginController {
 	}
 
 	@PostMapping("/workoutlogins")
-    public ResponseEntity<String> handleWorkoutLogin(@RequestBody String jsonInput) {
-        // Print the received JSON string
-        System.out.println("Received JSON: " + jsonInput);
+	public ResponseEntity<String> handleWorkoutLogin(@RequestBody String jsonInput) {
+		// Print the received JSON string
+		System.out.println("Received JSON: " + jsonInput);
 
-        // Construct the response
-        String responseMessage = "Received the following JSON: " + jsonInput;
+		// Construct the response
+		String responseMessage = "Received the following JSON: " + jsonInput;
 
-        // Return the response
-        return ResponseEntity.ok(responseMessage);
-    }
+		// Return the response
+		return ResponseEntity.ok(responseMessage);
+	}
+
+//	@PostMapping("/workoutlogins")
+//	public ResponseEntity<?> addWorkout(@RequestBody Map<String, Object> workoutData) {
+//	    System.out.println("Received workout data: " + workoutData);
+//
+//	    // Extract user ID and exercise data
+//	    Integer userId = (Integer) workoutData.get("userId");
+//	    Map<String, Object> exerciseData = (Map<String, Object>) workoutData.get("exerciseData");
+//	    
+//	    // Print the extracted data
+//	    System.out.println("User ID: " + userId);
+//	    System.out.println("Exercise Data: " + exerciseData);
+//
+//	    return ResponseEntity.ok("Workout data received");
+//	}
+
 }

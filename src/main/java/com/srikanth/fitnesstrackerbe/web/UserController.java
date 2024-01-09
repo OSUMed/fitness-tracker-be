@@ -36,6 +36,7 @@ import org.springframework.http.ResponseEntity;
 import com.srikanth.fitnesstrackerbe.util.CookieUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+
 @RestController
 @CrossOrigin(origins = "*")
 public class UserController {
@@ -64,91 +65,84 @@ public class UserController {
 //        
 //        return ResponseEntity.ok(savedUser);
 //    }
-	
+
 	@GetMapping("/tryme")
 	public ResponseEntity<String> tryme() {
 		System.out.println("This is the try me endpoint!");
-	    return ResponseEntity.ok("Endpoint reached");
+		return ResponseEntity.ok("Endpoint reached");
 	}
+
 	@GetMapping("/user/hello")
 	public ResponseEntity<String> userEndpoints() {
 		System.out.println("Hello you reached user endpoint");
 		return ResponseEntity.ok("User Endpoint reached");
 	}
 
-	 @GetMapping("/account")
-	    public String currentUserName() {
-	        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-	        if (authentication != null && authentication.isAuthenticated()) {
-	        	System.out.println("Who is user? " + authentication.getName());
-	            return authentication.getName();
-	        }
-	        return null; 
-	    }
-    @PostMapping("/register")
-    public ResponseEntity<RegisterationResponse> signUpUser (@RequestBody User user) {
-    	User savedUser = userService.registerNewUser(user.getUsername(), user.getPassword());
-    	RegisterationResponse regResponse = new RegisterationResponse(savedUser.getUsername());
- 
-		return ResponseEntity
-				.ok()
-				.body(regResponse);
+	@GetMapping("/account")
+	public String currentUserName() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication != null && authentication.isAuthenticated()) {
+			System.out.println("Who is user? " + authentication.getName());
+			return authentication.getName();
+		}
+		return null;
 	}
 
-    @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> loginUser(@RequestBody User user) {
-        User loggedInUser = (User) userService.loadUserByUsername(user.getUsername());
-        String accessToken = jwtService.generateToken(new HashMap<>(), loggedInUser);
-        RefreshToken refreshToken = refreshTokenService.generateRefreshToken(loggedInUser);
+	@PostMapping("/register")
+	public ResponseEntity<RegisterationResponse> signUpUser(@RequestBody User user) {
+		User savedUser = userService.registerNewUser(user.getUsername(), user.getPassword());
+		RegisterationResponse regResponse = new RegisterationResponse(savedUser.getUsername());
 
-        // Calculate the duration for the cookie based on the refresh token's expiration
-        long remainingAge = refreshTokenService.getRemainingTimeForRefreshToken(refreshToken);
-        
-        // Create the refresh token cookie
-        String refreshTokenCookie = CookieUtils.createRefreshTokenCookie(
-                refreshToken.getRefreshToken(), 
-                remainingAge
-            );
+		return ResponseEntity.ok().body(regResponse);
+	}
+
+	@PostMapping("/login")
+	public ResponseEntity<AuthenticationResponse> loginUser(@RequestBody User user) {
+		User loggedInUser = (User) userService.loadUserByUsername(user.getUsername());
+		String accessToken = jwtService.generateToken(new HashMap<>(), loggedInUser);
+		RefreshToken refreshToken = refreshTokenService.generateRefreshToken(loggedInUser);
+
+		// Calculate the duration for the cookie based on the refresh token's expiration
+		long remainingAge = refreshTokenService.getRemainingTimeForRefreshToken(refreshToken);
+
+		// Create the refresh token cookie
+		String refreshTokenCookie = CookieUtils.createRefreshTokenCookie(refreshToken.getRefreshToken(), remainingAge);
 //        ResponseCookie refreshTokenCookie = CookieUtils.createRefreshTokenCookie(
 //            refreshToken.getRefreshToken(), 
 //            remainingAge
 //        );
 
-        // Create the authentication response object
-        AuthenticationResponse authResponse = new AuthenticationResponse(
-            loggedInUser.getUsername(), 
-            accessToken, 
-            refreshToken.getRefreshToken()
-        );
+		// Create the authentication response object
+		AuthenticationResponse authResponse = new AuthenticationResponse(loggedInUser.getUsername(), accessToken,
+				refreshToken.getRefreshToken());
 
-        // Build the response and add the refresh token cookie and access token to the headers
-        return ResponseEntity.ok()
-                .header("Set-Cookie", refreshTokenCookie)
-                .header("Authorization", "Bearer " + accessToken)
-                .body(authResponse);
-    }
-    
-    @PostMapping("/api/logout")
-    public ResponseEntity<LogoutResponse> logoutUser(HttpServletResponse response) {
-        // Get the currently authenticated user from the security context
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		// Build the response and add the refresh token cookie and access token to the
+		// headers
+		return ResponseEntity.ok().header("Set-Cookie", refreshTokenCookie)
+				.header("Authorization", "Bearer " + accessToken).body(authResponse);
+	}
 
-        if (authentication != null) {
-            String username = authentication.getName();
+	@PostMapping("/api/logout")
+	public ResponseEntity<LogoutResponse> logoutUser(HttpServletResponse response) {
+		// Get the currently authenticated user from the security context
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            // Invalidate refresh token in the database
-            refreshTokenService.deleteRefreshTokenByUsername(username);
+		if (authentication != null) {
+			String username = authentication.getName();
 
-            // Clear refresh token cookie using CookieUtils
-            ResponseCookie refreshTokenCookie = CookieUtils.clearCookie("refreshToken");
-            response.setHeader("Set-Cookie", refreshTokenCookie.toString());
+			// Invalidate refresh token in the database
+			refreshTokenService.deleteRefreshTokenByUsername(username);
 
-            return ResponseEntity.ok(new LogoutResponse("Successfully logged out"));
-        } else {
-            // Handle the case when there is no authenticated user (optional)
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LogoutResponse("Not authenticated"));
-        }
-    }
+			// Clear refresh token cookie using CookieUtils
+			ResponseCookie refreshTokenCookie = CookieUtils.clearCookie("refreshToken");
+			response.setHeader("Set-Cookie", refreshTokenCookie.toString());
+
+			return ResponseEntity.ok(new LogoutResponse("Successfully logged out"));
+		} else {
+			// Handle the case when there is no authenticated user (optional)
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LogoutResponse("Not authenticated"));
+		}
+	}
 
 	@PostMapping("/refreshtoken")
 	public ResponseEntity<RefreshTokenResponse> getNewAccessToken(
@@ -156,11 +150,12 @@ public class UserController {
 		String accessToken = refreshTokenService.createNewAccessToken(refreshTokenRequest);
 		return ResponseEntity.ok(new RefreshTokenResponse(accessToken, refreshTokenRequest.refreshToken()));
 	}
-	
+
 	@GetMapping("/getusers")
 	public List<User> getUsers() {
 		return userService.getAllUsers();
 	}
+
 	@GetMapping("/test")
 	public String testEnd() {
 		return "This is the test endpoint holla";

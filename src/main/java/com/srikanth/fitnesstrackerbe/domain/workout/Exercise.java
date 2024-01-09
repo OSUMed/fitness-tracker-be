@@ -15,54 +15,62 @@ import com.srikanth.fitnesstrackerbe.domain.User;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Exercise {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    private String name;
+	private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+	@ManyToOne
+	@JoinColumn(name = "user_id")
+	private User user;
 
-    public Exercise() {
-    }
+	@ManyToOne
+	@JoinColumn(name = "exercise_detail_id")
+	private ExerciseDetail exerciseDetail;
 
-    public Exercise(String name, User user) {
-        this.name = name;
-        this.user = user;
-    }
+	public Exercise() {
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public Exercise(String name, User user) {
+		this.name = name;
+		this.user = user;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public ExerciseDetail getExerciseDetail() {
+		return exerciseDetail;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public void setExerciseDetail(ExerciseDetail exerciseDetail) {
+		this.exerciseDetail = exerciseDetail;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public User getUser() {
-        return user;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public void setUser(User user) {
-        this.user = user;
-    }
+	public String getName() {
+		return name;
+	}
 
-    @Override
-    public String toString() {
-        return "Exercise{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", user=" + user +
-                '}';
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	@Override
+	public String toString() {
+		return "Exercise{" + "id=" + id + ", name='" + name + '\'' + ", user=" + user + '}';
+	}
 }
