@@ -29,7 +29,8 @@ public class Exercise {
 
 	// Indicates the field in
 	// ExerciseSet that owns the  relationship
-	@OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY, cascade = CascadeType.ALL) 
+	@OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY, cascade = {
+            CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH })
 	private List<ExerciseSet> sets;
 
 	@ManyToOne
@@ -40,6 +41,10 @@ public class Exercise {
 	@JoinColumn(name = "exercise_detail_id")
 	private ExerciseDetail exerciseDetail;
 
+	@ManyToOne
+	@JoinColumn(name = "todays_workout_id")
+	private TodaysWorkout workout;
+	
 	public Exercise() {
 	}
 

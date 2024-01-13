@@ -22,7 +22,7 @@ public class TodaysWorkout {
 	@Column
 	private Date date;
 
-	@OneToMany(mappedBy = "workout", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "workout", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
 	private List<Exercise> exercises;
 
 	public Integer getId() {
