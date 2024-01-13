@@ -1,7 +1,10 @@
 package com.srikanth.fitnesstrackerbe.domain.workout;
 
 import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.InheritanceType;
@@ -9,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 import com.srikanth.fitnesstrackerbe.dao.workout.ExerciseSetDTO;
 import com.srikanth.fitnesstrackerbe.domain.User;
@@ -22,7 +26,11 @@ public class Exercise {
 	private Long id;
 	private String type;
 	private String exerciseName;
-	private List<? extends ExerciseSet> sets;
+
+	// Indicates the field in
+	// ExerciseSet that owns the  relationship
+	@OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY, cascade = CascadeType.ALL) 
+	private List<ExerciseSet> sets;
 
 	@ManyToOne
 	@JoinColumn(name = "user_id")
@@ -80,7 +88,7 @@ public class Exercise {
 	}
 
 	public void setSets(List<ExerciseSet> sets) {
-	    this.sets = sets;
+		this.sets = sets;
 	}
 
 	@Override
