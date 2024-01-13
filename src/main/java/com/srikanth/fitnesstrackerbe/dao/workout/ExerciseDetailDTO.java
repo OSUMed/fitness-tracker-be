@@ -14,7 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import com.srikanth.fitnesstrackerbe.domain.User;
 
-@Entity
+
 public class ExerciseDetailDTO {
 
     private Long id;

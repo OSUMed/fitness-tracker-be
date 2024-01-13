@@ -15,22 +15,15 @@ import com.srikanth.fitnesstrackerbe.domain.User;
 
 import java.util.Date;
 
-@Entity
 public class ExerciseLogDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Date date; // The date when the exercise was performed
     private String notes; // Any specific notes about the exercise instance
 
-    @OneToOne
-    @JoinColumn(name = "exercise_detail_id")
     private ExerciseDetailDTO exerciseDetail;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
     private User user;
 
     // Constructors
