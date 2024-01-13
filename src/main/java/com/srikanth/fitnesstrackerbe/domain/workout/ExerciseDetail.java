@@ -3,6 +3,7 @@ package com.srikanth.fitnesstrackerbe.domain.workout;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -29,6 +30,8 @@ public class ExerciseDetail {
     private String difficulty; // For Stretch
     private String infoLink;
     private String notes;
+	@Column
+	private Integer userId;
 
     // One-to-Many relationship with Exercise
     @OneToMany(mappedBy = "exerciseDetail", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -59,7 +62,13 @@ public class ExerciseDetail {
 	public void setId(Long id) {
 		this.id = id;
 	}
+	public Integer getUserId() {
+		return userId;
+	}
 
+	public void setUserId(Integer userId) {
+		this.userId = userId;
+	}
 	public String getType() {
 		return type;
 	}

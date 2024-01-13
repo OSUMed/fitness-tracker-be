@@ -20,7 +20,6 @@ public class StrengthExercise extends Exercise {
     }
 
     public StrengthExercise(String name, User user, List<StrengthSet> sets) {
-        super();
         this.sets = sets;
     }
 

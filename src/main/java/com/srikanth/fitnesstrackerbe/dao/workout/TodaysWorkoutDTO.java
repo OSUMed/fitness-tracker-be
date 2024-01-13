@@ -5,23 +5,36 @@ import java.util.List;
 import java.util.Objects;
 
 public class TodaysWorkoutDTO {
+	private Integer id;
     private Integer userId;
     private Date date;
     private List<ExerciseDTO> exercises;
 
     // Constructors
-    public TodaysWorkoutDTO(Integer userId, Date date, List<ExerciseDTO> exercises) {
-        this.userId = userId;
-        this.date = date;
-        this.exercises = exercises;
-    }
+	public TodaysWorkoutDTO(Integer id, Integer userId, Date date, List<ExerciseDTO> exercises) {
+		super();
+		this.id = id;
+		this.userId = userId;
+		this.date = date;
+		this.exercises = exercises;
+	}
 
     // Getters
     public Integer getUserId() {
         return userId;
     }
 
-    public Date getDate() {
+    public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+
+
+	public Date getDate() {
         return date;
     }
 
