@@ -3,11 +3,14 @@ package com.srikanth.fitnesstrackerbe.dao.workout;
 public class CardioSetDTO extends ExerciseSetDTO{
     private String distance;
 
+    public CardioSetDTO() {
+    }
+
     public CardioSetDTO(String distance) {
-    	super();
         this.distance = distance;
     }
 
+    // Getters and Setters
     public String getDistance() {
         return distance;
     }
@@ -16,11 +19,11 @@ public class CardioSetDTO extends ExerciseSetDTO{
         this.distance = distance;
     }
 
-    // toString
     @Override
     public String toString() {
-        return "CardioSetDTO{" +
-                "distance='" + distance + '\'' +
+        return "CardioSet{" +
+                "id=" + getId() +
+                ", distance='" + distance + '\'' +
                 '}';
     }
 }
