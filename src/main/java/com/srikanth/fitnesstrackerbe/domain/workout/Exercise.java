@@ -14,7 +14,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
-import com.srikanth.fitnesstrackerbe.dao.workout.ExerciseSetDTO;
 import com.srikanth.fitnesstrackerbe.domain.User;
 
 @Entity
