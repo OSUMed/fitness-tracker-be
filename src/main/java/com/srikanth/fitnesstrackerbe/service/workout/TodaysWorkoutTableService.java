@@ -31,7 +31,7 @@ public class TodaysWorkoutTableService {
 
 	public TodaysWorkout processTodaysWorkoutData(Map<String, Object> fullExerciseData) {
 		 ExerciseDTO exerciseDTO = exerciseService.processExerciseData(fullExerciseData);
-		 System.out.println("@PostMapping(\"/workoutlogins\") Mapped DTO: " + exerciseDTO + " userId: " + exerciseDTO.getUserId());
+		 System.out.println("TodaysWorkout processTodaysWorkoutData Mapped DTO: " + exerciseDTO + " userId: " + exerciseDTO.getUserId());
 		 Exercise exercise = exerciseService.convertExerciseDTOToExercise(exerciseDTO);
 //		 todaysWorkoutRepository.findByUserId(exercise.getUserId());
 		 todaysWorkoutRepository.findByUserId(exerciseDTO.getUserId());
