@@ -6,7 +6,7 @@ public class StrengthExerciseDTO extends ExerciseDTO {
 	private List<StrengthSetDTO> strengthSets;
 
 	public StrengthExerciseDTO(String type, String exerciseName, List<StrengthSetDTO> strengthSets) {
-		super(type, exerciseName, strengthSets);
+		super();
 		this.strengthSets = strengthSets;
 	}
 

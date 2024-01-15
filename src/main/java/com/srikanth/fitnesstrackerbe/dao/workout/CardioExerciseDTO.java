@@ -5,7 +5,7 @@ public class CardioExerciseDTO extends ExerciseDTO {
     private List<CardioSetDTO> cardioSets;
 
 	public CardioExerciseDTO(String type, String exerciseName, List<CardioSetDTO> cardioSets) {
-		super(type, exerciseName, cardioSets);
+		super();
 		this.cardioSets = cardioSets;
 	}
 

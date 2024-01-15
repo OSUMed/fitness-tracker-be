@@ -5,7 +5,7 @@ public class StretchExerciseDTO extends ExerciseDTO {
 	private List<StretchSetDTO> stretchSets;
 
 	public StretchExerciseDTO(String type, String exerciseName, List<StretchSetDTO> stretchSets) {
-		super(type, exerciseName, stretchSets);
+		super();
 		this.stretchSets = stretchSets;
 	}
 
