@@ -11,5 +11,5 @@ import java.util.Optional;
 @Repository
 public interface TodaysWorkoutRepository extends JpaRepository<TodaysWorkout, Integer> {
 
-    Optional<TodaysWorkout> findByUserIdAndDate(Integer userId, Date date);
+    Optional<TodaysWorkout> findByUserId(Integer userId);
 }

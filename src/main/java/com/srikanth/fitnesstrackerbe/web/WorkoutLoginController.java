@@ -15,8 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.srikanth.fitnesstrackerbe.dao.workout.ExerciseDTO;
 import com.srikanth.fitnesstrackerbe.dao.workout.TodaysWorkoutDTO;
 import com.srikanth.fitnesstrackerbe.domain.Product;
+import com.srikanth.fitnesstrackerbe.domain.workout.TodaysWorkout;
 import com.srikanth.fitnesstrackerbe.service.workout.ExerciseService;
-import com.srikanth.fitnesstrackerbe.service.workout.TodayWorkoutTableService;
+import com.srikanth.fitnesstrackerbe.service.workout.TodaysWorkoutTableService;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -24,7 +25,7 @@ import com.srikanth.fitnesstrackerbe.service.workout.TodayWorkoutTableService;
 public class WorkoutLoginController {
 	
 	@Autowired
-	private TodayWorkoutTableService todayWorkoutService;
+	private TodaysWorkoutTableService todaysWorkoutTableService;
     @Autowired
     private ExerciseService exerciseService;
     
@@ -49,7 +50,7 @@ public class WorkoutLoginController {
 //	}
 
 	@PostMapping("/workoutlogins")
-	public ResponseEntity<ExerciseDTO> addWorkout(@RequestBody Map<String, Object> workoutData) {
+	public ResponseEntity<TodaysWorkout> addWorkout(@RequestBody Map<String, Object> workoutData) {
 	    System.out.println("Received workout data: " + workoutData);
 
 	    @SuppressWarnings("unchecked")
@@ -59,13 +60,11 @@ public class WorkoutLoginController {
 	    // Print the extracted data
 	    System.out.println("User ID: " + userId);
 	    System.out.println("Exercise Data: " + exerciseData);
-	    ExerciseDTO exerciseDTO = exerciseService.processExerciseData(workoutData);
-	    Integer returnedUserId = exerciseDTO.getUserId();
-        System.out.println("@PostMapping(\"/workoutlogins\") Mapped DTO: " + exerciseDTO + " userId: " + returnedUserId);
-
+	    TodaysWorkout todayWorkout = todaysWorkoutTableService.processTodaysWorkoutData(workoutData);
+       
         // Then, add the exercise
 //        TodaysWorkoutDTO updatedWorkout = todayWorkoutService.addExercise(todaysWorkoutDTO);
-        return ResponseEntity.ok(exerciseDTO);
+        return ResponseEntity.ok(todayWorkout);
 	}
 
 }

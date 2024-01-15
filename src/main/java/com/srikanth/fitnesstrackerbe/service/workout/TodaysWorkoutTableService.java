@@ -20,14 +20,25 @@ import java.util.Map;
 import com.srikanth.fitnesstrackerbe.dao.workout.*;
 
 @Service
-public class TodayWorkoutTableService {
+public class TodaysWorkoutTableService {
 
 	@Autowired
 	private UserRepository userRepository;
 	@Autowired
 	private TodaysWorkoutRepository todaysWorkoutRepository;
+	@Autowired
+	private ExerciseService exerciseService;
 
-	public TodaysWorkout processTodaysWorkoutData(Map<String, Object> workoutData) {
+	public TodaysWorkout processTodaysWorkoutData(Map<String, Object> fullExerciseData) {
+		 ExerciseDTO exerciseDTO = exerciseService.processExerciseData(fullExerciseData);
+		 System.out.println("@PostMapping(\"/workoutlogins\") Mapped DTO: " + exerciseDTO + " userId: " + exerciseDTO.getUserId());
+		 Exercise exercise = exerciseService.convertExerciseDTOToExercise(exerciseDTO);
+//		 todaysWorkoutRepository.findByUserId(exercise.getUserId());
+		 todaysWorkoutRepository.findByUserId(exerciseDTO.getUserId());
+		return new TodaysWorkout();
+	}
+	
+	public TodaysWorkout addExerciseToTodayWorkout(Map<String, Object> workoutData) {
 	
 		return new TodaysWorkout();
 	}

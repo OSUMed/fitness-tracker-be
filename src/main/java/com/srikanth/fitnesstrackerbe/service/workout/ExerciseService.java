@@ -87,6 +87,10 @@ public class ExerciseService {
 
 	}
 
+	public Exercise convertExerciseDTOToExercise(ExerciseDTO exerciseDTO) {
+		return null;
+		
+	}
 //	public TodaysWorkoutDTO addExercise(TodaysWorkoutDTO todaysWorkoutDTO) {
 //		// Convert exerciseDTO to domain entity if necessary
 //		TodaysWorkout todayWorkout = convertToEntity(todaysWorkoutDTO);
