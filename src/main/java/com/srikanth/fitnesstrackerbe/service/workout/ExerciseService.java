@@ -23,6 +23,10 @@ import com.srikanth.fitnesstrackerbe.repository.workout.TodaysWorkoutRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.sql.Date;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import com.srikanth.fitnesstrackerbe.dao.workout.*;
@@ -38,7 +42,10 @@ public class ExerciseService {
 	public ExerciseDTO convertDataToExerciseDTO(Map<String, Object> fullExerciseData) {
 		Integer userId = (Integer) fullExerciseData.get("userId");
 		User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-		Date date = new Date((Long) fullExerciseData.get("date"));
+	    
+		Instant instant = Instant.parse((String) fullExerciseData.get("date"));
+	    LocalDate date = instant.atZone(ZoneId.systemDefault()).toLocalDate();
+
 
 		System.out.println("processWorkoutData: Received workout data: " + fullExerciseData);
 
@@ -51,7 +58,7 @@ public class ExerciseService {
 		Map<String, Object> exerciseData = (Map<String, Object>) fullExerciseData.get("exerciseData");
 
 		String type = (String) exerciseData.get("type");
-		String exerciseName = (String) exerciseData.get("exercise_name");
+		String exerciseName = (String) exerciseData.get("exerciseName");
 		@SuppressWarnings("unchecked")
 		List<Map<String, Object>> setsData = (List<Map<String, Object>>) exerciseData.get("sets");
 		System.out.println("preExerciseDTO type & exercise name data: " + type + " & " + exerciseName);
@@ -67,7 +74,7 @@ public class ExerciseService {
 			for (Map<String, Object> setData : setsData) {
 				// Converts each map in setsData into the appropriate SetDTO using ObjectMapper.
 				CardioSetDTO cardioSet = mapper.convertValue(setData, CardioSetDTO.class);
-				
+
 				// Adds each converted SetDTO to a list.
 				cardioSets.add(cardioSet);
 			}
@@ -97,7 +104,6 @@ public class ExerciseService {
 			System.out.println("Unknown set type in setsData: " + type);
 		}
 
-	
 		return exerciseDTO;
 
 	}
@@ -134,43 +140,101 @@ public class ExerciseService {
 		return exercise;
 	}
 
-	
-//	public TodaysWorkoutDTO addExercise(TodaysWorkoutDTO todaysWorkoutDTO) {
-//		// Convert exerciseDTO to domain entity if necessary
-//		TodaysWorkout todayWorkout = convertToEntity(todaysWorkoutDTO);
-//		// Check if there's an existing workout for today
-//		Optional<TodaysWorkout> existingWorkout = todaysWorkoutRepository
-//				.findByUserIdAndDate(todaysWorkoutDTO.getUserId(), todaysWorkoutDTO.getDate());
-//
-//		System.out.println("Returned workout is: " + existingWorkout);
-//
-//		if (existingWorkout.isPresent()) {
-//			// Logic to add the exercise to the existing workout
-//		} else {
-//			// Logic to create a new workout
-//		}
-//		// Add exercise to the workout
-//		// Save updated workout in the database
-//		// Convert the updated workout to TodaysWorkoutDTO
-//		// Return the DTO
-//
-//		// Delete Line
-//		return new TodaysWorkoutDTO(null, null, null);
-//
-//	}
-
-	private TodaysWorkout convertToEntity(TodaysWorkoutDTO todaysWorkoutDTO) {
-		TodaysWorkout todayWorkout = new TodaysWorkout();
-		todayWorkout.setUserId(todaysWorkoutDTO.getUserId());
-		Date sqlDate = new Date(todaysWorkoutDTO.getDate().getTime());
-		todayWorkout.setDate(sqlDate);
-
-		// Convert each ExerciseDTO to an Exercise entity and add it to the workout
-//	    List<Exercise> exercises = todaysWorkoutDTO.getExercises().stream()
-//	        .map(this::convertExerciseDtoToEntity)
-//	        .collect(Collectors.toList());
-//	    todayWorkout.setExercises(exercises);
-
-		return new TodaysWorkout();
+	public List<ExerciseSet> convertSetDTOsToExerciseSets(List<? extends ExerciseSetDTO> setDTOs, Exercise exercise) {
+		List<ExerciseSet> exerciseSets = new ArrayList<>();
+		for (ExerciseSetDTO setDTO : setDTOs) {
+			ExerciseSet exerciseSet = null;
+			if (setDTO instanceof CardioSetDTO) {
+				CardioSet cardioSet = new CardioSet();
+				cardioSet.setExercise(exercise);
+				cardioSet.setDistance(((CardioSetDTO) setDTO).getDistance());
+				exerciseSet = cardioSet;
+			} else if (setDTO instanceof StrengthSetDTO) {
+				StrengthSet strengthSet = new StrengthSet();
+				strengthSet.setExercise(exercise);
+				strengthSet.setReps(((StrengthSetDTO) setDTO).getReps());
+				strengthSet.setWeight(((StrengthSetDTO) setDTO).getWeight());
+				exerciseSet = strengthSet;
+			} else if (setDTO instanceof StretchSetDTO) {
+				StretchSet stretchSet = new StretchSet();
+				stretchSet.setExercise(exercise);
+				stretchSet.setSeconds(((StretchSetDTO) setDTO).getSeconds());
+				exerciseSet = stretchSet;
+			}
+			if (exerciseSet != null) {
+				exerciseSet.setExercise(exercise);
+				exerciseSets.add(exerciseSet);
+			}
+		}
+		return exerciseSets;
 	}
+
+	public TodaysWorkoutDTO convertDomainToDTO(TodaysWorkout todaysWorkout) {
+		TodaysWorkoutDTO todaysWorkoutDTO = new TodaysWorkoutDTO();
+		todaysWorkoutDTO.setUserId(todaysWorkout.getUserId());
+		
+	    // Convert java.util.Date to java.sql.Date
+	    java.util.Date utilDate = todaysWorkout.getDate();
+	    if (utilDate != null) {
+	        java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+	        todaysWorkoutDTO.setDate(sqlDate);
+	    }
+
+		List<ExerciseDTO> exerciseDTOs = todaysWorkout.getExercises().stream().map(this::convertExerciseToDTO)
+				.collect(Collectors.toList());
+
+		todaysWorkoutDTO.setExercises(exerciseDTOs);
+
+		return todaysWorkoutDTO;
+	}
+
+	private ExerciseDTO convertExerciseToDTO(Exercise exercise) {
+	    ExerciseDTO exerciseDTO = null;
+
+	    if (exercise instanceof CardioExercise) {
+	        List<CardioSetDTO> cardioSetDTOs = ((CardioExercise) exercise).getSets().stream()
+	                .map(set -> (CardioSetDTO) convertSetToDTO(set)) 
+	                .collect(Collectors.toList());
+	        exerciseDTO = ExerciseDTO.createCardioExerciseDTO(exercise.getId(), exercise.getExerciseName(),
+	                cardioSetDTOs, exercise.getUser().getId(), null);
+	    } else if (exercise instanceof StrengthExercise) {
+	        List<StrengthSetDTO> strengthSetDTOs = ((StrengthExercise) exercise).getSets().stream()
+	                .map(set -> (StrengthSetDTO) convertSetToDTO(set)) 
+	                .collect(Collectors.toList());
+	        exerciseDTO = ExerciseDTO.createStrengthExerciseDTO(exercise.getId(), exercise.getExerciseName(),
+	                strengthSetDTOs, exercise.getUser().getId(), null);
+	    } else if (exercise instanceof StretchExercise) {
+	        List<StretchSetDTO> stretchSetDTOs = ((StretchExercise) exercise).getSets().stream()
+	                .map(set -> (StretchSetDTO) convertSetToDTO(set)) 
+	                .collect(Collectors.toList());
+	        exerciseDTO = ExerciseDTO.createStretchExerciseDTO(exercise.getId(), exercise.getExerciseName(),
+	                stretchSetDTOs, exercise.getUser().getId(), null);
+	    }
+	    return exerciseDTO;
+	}
+
+
+	private ExerciseSetDTO convertSetToDTO(ExerciseSet set) {
+	    if (set instanceof CardioSet) {
+	        CardioSet cardioSet = (CardioSet) set;
+	        CardioSetDTO cardioSetDTO = new CardioSetDTO();
+	        cardioSetDTO.setDistance(cardioSet.getDistance());
+	        return cardioSetDTO;
+	    } else if (set instanceof StrengthSet) {
+	        StrengthSet strengthSet = (StrengthSet) set;
+	        StrengthSetDTO strengthSetDTO = new StrengthSetDTO();
+	        strengthSetDTO.setReps(strengthSet.getReps());
+	        strengthSetDTO.setWeight(strengthSet.getWeight());
+	        return strengthSetDTO;
+	    } else if (set instanceof StretchSet) {
+	        StretchSet stretchSet = (StretchSet) set;
+	        StretchSetDTO stretchSetDTO = new StretchSetDTO();
+	        stretchSetDTO.setSeconds(stretchSet.getSeconds());
+	        return stretchSetDTO;
+	    } else {
+	        throw new IllegalArgumentException("Unknown set type: " + set.getClass().getSimpleName());
+	    }
+	}
+
+
 }
