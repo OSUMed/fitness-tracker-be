@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import com.srikanth.fitnesstrackerbe.domain.workout.TodaysWorkout;
 
-import java.util.Date;
+import java.sql.Date;
 import java.util.Optional;
 
 @Repository

@@ -1,6 +1,6 @@
 package com.srikanth.fitnesstrackerbe.domain.workout;
 
-import java.util.Date;
+import java.sql.Date;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
