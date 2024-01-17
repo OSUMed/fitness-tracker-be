@@ -3,18 +3,17 @@ package com.srikanth.fitnesstrackerbe.dao.workout;
 import java.sql.Date;
 import java.util.List;
 import java.util.Objects;
-
+import java.util.ArrayList;
 public class TodaysWorkoutDTO {
 	private Integer id;
 	private Integer userId;
 	private Date date;
-	private List<ExerciseDTO> exercises;
+	private List<ExerciseDTO> exercises = new ArrayList<>();
 
 	// Constructors
 	public TodaysWorkoutDTO() {
 
 	}
-
 	public TodaysWorkoutDTO(Integer id, Integer userId, Date date, List<ExerciseDTO> exercises) {
 		super();
 		this.id = id;
