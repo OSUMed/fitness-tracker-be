@@ -73,4 +73,10 @@ public class TodaysWorkout {
 		this.exercises = exercises;
 	}
 
+	@Override
+	public String toString() {
+		return "TodaysWorkout [id=" + id + ", userId=" + userId + ", date=" + date + ", exercises=" + exercises
+				+ ", exerciseLog=" + exerciseLog + "]";
+	}
+
 }
