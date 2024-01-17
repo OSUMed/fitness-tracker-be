@@ -28,8 +28,7 @@ public class Exercise {
 
 	// Indicates the field in
 	// ExerciseSet that owns the  relationship
-	@OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY, cascade = {
-            CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH })
+	@OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<ExerciseSet> sets;
 
 	@ManyToOne
@@ -93,6 +92,14 @@ public class Exercise {
 
 	public void setSets(List<ExerciseSet> sets) {
 		this.sets = sets;
+	}
+
+	public TodaysWorkout getWorkout() {
+		return workout;
+	}
+
+	public void setWorkout(TodaysWorkout workout) {
+		this.workout = workout;
 	}
 
 	@Override
