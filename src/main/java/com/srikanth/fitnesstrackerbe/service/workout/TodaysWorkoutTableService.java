@@ -30,16 +30,42 @@ public class TodaysWorkoutTableService {
 	private ExerciseService exerciseService;
 
 	public TodaysWorkout processTodaysWorkoutData(Map<String, Object> fullExerciseData) {
-		 ExerciseDTO exerciseDTO = exerciseService.processExerciseData(fullExerciseData);
-		 System.out.println("TodaysWorkout processTodaysWorkoutData Mapped DTO: " + exerciseDTO + " userId: " + exerciseDTO.getUserId());
-		 Exercise exercise = exerciseService.convertExerciseDTOToExercise(exerciseDTO);
-//		 todaysWorkoutRepository.findByUserId(exercise.getUserId());
-		 todaysWorkoutRepository.findByUserId(exerciseDTO.getUserId());
+		ExerciseDTO exerciseDTO = exerciseService.convertDataToExerciseDTO(fullExerciseData);
+		System.out.println("final exerciseDTO: " + exerciseDTO + " exerciseDTO's userId: "
+				+ exerciseDTO.getUserId());
+		Exercise exercise = exerciseService.convertExerciseDTOToExercise(exerciseDTO);
+		System.out.println("exercise domain: " + exercise);
+		User user = userRepository.findById(exerciseDTO.getUserId())
+				.orElseThrow(() -> new RuntimeException("User not found"));
+		java.sql.Date todaySqlDate = new java.sql.Date(System.currentTimeMillis());
+
+
+		Optional<TodaysWorkout> existingWorkout = todaysWorkoutRepository.findByUserIdAndDate(user.getId(), todaySqlDate);
+
+		TodaysWorkout todaysWorkout;
+		if (existingWorkout.isPresent()) {
+			todaysWorkout = existingWorkout.get();
+		} else {
+			todaysWorkout = new TodaysWorkout();
+			todaysWorkout.setUserId(user.getId());
+			todaysWorkout.setDate(todaySqlDate);
+			todaysWorkout.setExercises(new ArrayList<Exercise>());
+		}
+		
+		// Add the exercise to today's workout
+		exercise.setWorkout(todaysWorkout);
+		todaysWorkout.getExercises().add(exercise);
+
+		System.out.println("Before repo saved todays workout is: " + todaysWorkout);
+		// Save today's workout
+		todaysWorkoutRepository.save(todaysWorkout);
+
+//		return todaysWorkout;
 		return new TodaysWorkout();
 	}
-	
+
 	public TodaysWorkout addExerciseToTodayWorkout(Map<String, Object> workoutData) {
-	
+
 		return new TodaysWorkout();
 	}
 
