@@ -91,5 +91,10 @@ public class TodaysWorkoutTableService {
 		return todaysWorkoutDTO;
 	}
 
+	public Optional<TodaysWorkout> findTodaysWorkoutByUser(Integer userId) {
+		return todaysWorkoutRepository.findByUserId(userId);
+	
+	}
+
 	
 }
