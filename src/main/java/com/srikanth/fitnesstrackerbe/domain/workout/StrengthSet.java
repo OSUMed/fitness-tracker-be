@@ -38,10 +38,10 @@ public class StrengthSet extends ExerciseSet {
 		this.weight = weight;
 	}
 
-	// toString method
 	@Override
 	public String toString() {
-		return "StrengthSet{" + "id=" + getId() + ", reps='" + reps + '\'' + ", weight='" + weight + '\'' + ", strength="
-				 + '}';
+		return "StrengthSet [reps=" + reps + ", weight=" + weight + "]";
 	}
+
+
 }

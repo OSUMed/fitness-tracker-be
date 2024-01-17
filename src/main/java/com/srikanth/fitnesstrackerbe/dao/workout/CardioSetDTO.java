@@ -19,11 +19,10 @@ public class CardioSetDTO extends ExerciseSetDTO{
         this.distance = distance;
     }
 
-    @Override
-    public String toString() {
-        return "CardioSet{" +
-                "id=" + getId() +
-                ", distance='" + distance + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "CardioSetDTO [distance=" + distance + "]";
+	}
+
+ 
 }

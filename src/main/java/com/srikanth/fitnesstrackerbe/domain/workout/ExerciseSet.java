@@ -17,28 +17,41 @@ public class ExerciseSet {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+
+	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	@JoinColumn(name = "exercise_id") // Foreign key column in ExerciseSet table
 	private Exercise exercise;
 
 	public ExerciseSet() {
-		
+
 	}
+
 	public ExerciseSet(Long id) {
 		super();
 		this.id = id;
 	}
 
+	public Exercise getExercise() {
+		return exercise;
+	}
+
+	public void setExercise(Exercise exercise) {
+		this.exercise = exercise;
+	}
+
 	public Long getId() {
 		return id;
 	}
+
 	public void setId(Long id) {
 		this.id = id;
 	}
+
 	@Override
 	public String toString() {
-		return "ExerciseSet [id=" + id + "]";
+		return "ExerciseSet [id=" + id + ", exercise=" + exercise + "]";
 	}
+
+
 
 }

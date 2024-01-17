@@ -28,10 +28,10 @@ public class StrengthSetDTO extends ExerciseSetDTO {
 		this.weight = weight;
 	}
 
-	// toString method
 	@Override
 	public String toString() {
-		return "StrengthSet{" + "id=" + getId() + ", reps='" + reps + '\'' + ", weight='" + weight + '\'' + ", strength="
-				 + '}';
+		return "StrengthSetDTO [reps=" + reps + ", weight=" + weight + "]";
 	}
+
+
 }

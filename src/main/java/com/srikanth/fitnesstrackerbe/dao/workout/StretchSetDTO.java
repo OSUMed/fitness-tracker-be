@@ -18,9 +18,8 @@ public class StretchSetDTO extends ExerciseSetDTO {
 		this.seconds = seconds;
 	}
 
-	// toString method
 	@Override
 	public String toString() {
-		return "StretchSet{" + "id=" + getId() + ", seconds='" + seconds + '\'' + '}';
+		return "StretchSetDTO [seconds=" + seconds + "]";
 	}
 }
