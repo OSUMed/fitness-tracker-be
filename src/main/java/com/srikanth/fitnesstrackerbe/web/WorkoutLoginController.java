@@ -60,11 +60,10 @@ public class WorkoutLoginController {
 	    // Print the extracted data
 	    System.out.println("User ID: " + userId);
 	    System.out.println("Exercise Data: " + exerciseData);
-	    TodaysWorkout todayWorkout = todaysWorkoutTableService.processTodaysWorkoutData(workoutData);
-       
-        // Then, add the exercise
-//        TodaysWorkoutDTO updatedWorkout = todayWorkoutService.addExercise(todaysWorkoutDTO);
-        return ResponseEntity.ok(todayWorkout);
+	    TodaysWorkout savedTodaysWorkout = todaysWorkoutTableService.processTodaysWorkoutData(workoutData);
+	    TodaysWorkout todaysWorkoutDTO = todaysWorkoutTableService.returnTodaysWorkoutData(savedTodaysWorkout);
+	    return ResponseEntity.ok(todaysWorkoutDTO);
+//        return ResponseEntity.ok(new TodaysWorkout());
 	}
 
 }

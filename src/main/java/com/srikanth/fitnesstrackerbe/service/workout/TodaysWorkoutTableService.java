@@ -58,10 +58,9 @@ public class TodaysWorkoutTableService {
 
 		System.out.println("Before repo saved todays workout is: " + todaysWorkout);
 		// Save today's workout
-		todaysWorkoutRepository.save(todaysWorkout);
+		TodaysWorkout savedTodaysWorkout = todaysWorkoutRepository.save(todaysWorkout);
 
-//		return todaysWorkout;
-		return new TodaysWorkout();
+		return savedTodaysWorkout;
 	}
 
 	public TodaysWorkout addExerciseToTodayWorkout(Map<String, Object> workoutData) {
@@ -107,4 +106,26 @@ public class TodaysWorkoutTableService {
 
 		return new TodaysWorkout();
 	}
+
+	public TodaysWorkoutDTO returnTodaysWorkoutData(TodaysWorkout workoutData) {
+		
+		// Get the TodaysWorkout from Repo
+		java.util.Date utilDate = workoutData.getDate();
+		java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+		Integer userId = workoutData.getId();
+		Optional<TodaysWorkout> databaseTodaysWorkout = todaysWorkoutRepository.findByUserIdAndDate(userId, sqlDate);
+		TodaysWorkoutDTO todaysWorkoutDTO = null;
+		System.out.println("postREPO Todays Workout: " + databaseTodaysWorkout);
+		
+		// Change it to DTO
+		if (databaseTodaysWorkout.isPresent()) {
+			todaysWorkoutDTO = exerciseService.convertDomainToDTO(databaseTodaysWorkout);
+		}
+		
+		System.out.println("Finished TodaysWorkoutDTO: " + databaseTodaysWorkout);
+		// Return DTO
+		return todaysWorkoutDTO;
+	}
+
+	
 }
