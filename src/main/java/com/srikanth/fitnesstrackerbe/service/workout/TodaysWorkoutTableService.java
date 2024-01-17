@@ -37,10 +37,13 @@ public class TodaysWorkoutTableService {
 		System.out.println("exercise domain: " + exercise);
 		User user = userRepository.findById(exerciseDTO.getUserId())
 				.orElseThrow(() -> new RuntimeException("User not found"));
-		java.sql.Date todaySqlDate = new java.sql.Date(System.currentTimeMillis());
+		java.util.Date todayDate = new java.util.Date();
+		java.sql.Date sqlDate = new java.sql.Date(todayDate.getTime());
 
 
-		Optional<TodaysWorkout> existingWorkout = todaysWorkoutRepository.findByUserIdAndDate(user.getId(), todaySqlDate);
+
+
+		Optional<TodaysWorkout> existingWorkout = todaysWorkoutRepository.findByUserIdAndDate(user.getId(), sqlDate);
 
 		TodaysWorkout todaysWorkout;
 		if (existingWorkout.isPresent()) {
@@ -48,7 +51,7 @@ public class TodaysWorkoutTableService {
 		} else {
 			todaysWorkout = new TodaysWorkout();
 			todaysWorkout.setUserId(user.getId());
-			todaysWorkout.setDate(todaySqlDate);
+			todaysWorkout.setDate(sqlDate);
 			todaysWorkout.setExercises(new ArrayList<Exercise>());
 		}
 		
@@ -68,58 +71,19 @@ public class TodaysWorkoutTableService {
 		return new TodaysWorkout();
 	}
 
-//	public TodaysWorkoutDTO addExercise(TodaysWorkoutDTO todaysWorkoutDTO) {
-//		// Convert exerciseDTO to domain entity if necessary
-//		TodaysWorkout todayWorkout = convertToEntity(todaysWorkoutDTO);
-//		// Check if there's an existing workout for today
-//		Optional<TodaysWorkout> existingWorkout = todaysWorkoutRepository
-//				.findByUserIdAndDate(todaysWorkoutDTO.getUserId(), todaysWorkoutDTO.getDate());
-//
-//		System.out.println("Returned workout is: " + existingWorkout);
-//
-//		if (existingWorkout.isPresent()) {
-//			// Logic to add the exercise to the existing workout
-//		} else {
-//			// Logic to create a new workout
-//		}
-//		// Add exercise to the workout
-//		// Save updated workout in the database
-//		// Convert the updated workout to TodaysWorkoutDTO
-//		// Return the DTO
-//
-//		// Delete Line
-//		return new TodaysWorkoutDTO(null, null, null);
-//
-//	}
-
-	private TodaysWorkout convertToEntity(TodaysWorkoutDTO todaysWorkoutDTO) {
-		TodaysWorkout todayWorkout = new TodaysWorkout();
-		todayWorkout.setUserId(todaysWorkoutDTO.getUserId());
-		Date sqlDate = new Date(todaysWorkoutDTO.getDate().getTime());
-		todayWorkout.setDate(sqlDate);
-
-		// Convert each ExerciseDTO to an Exercise entity and add it to the workout
-//	    List<Exercise> exercises = todaysWorkoutDTO.getExercises().stream()
-//	        .map(this::convertExerciseDtoToEntity)
-//	        .collect(Collectors.toList());
-//	    todayWorkout.setExercises(exercises);
-
-		return new TodaysWorkout();
-	}
-
 	public TodaysWorkoutDTO returnTodaysWorkoutData(TodaysWorkout workoutData) {
 		
 		// Get the TodaysWorkout from Repo
-		java.util.Date utilDate = workoutData.getDate();
-		java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
-		Integer userId = workoutData.getId();
-		Optional<TodaysWorkout> databaseTodaysWorkout = todaysWorkoutRepository.findByUserIdAndDate(userId, sqlDate);
+		java.sql.Date utilDate = workoutData.getDate();
+		Integer userId = workoutData.getUserId();
+		System.out.println("preREPO Todays Workout Query: " + utilDate);
+		Optional<TodaysWorkout> databaseTodaysWorkout = todaysWorkoutRepository.findByUserIdAndDate(userId, utilDate);
 		TodaysWorkoutDTO todaysWorkoutDTO = null;
 		System.out.println("postREPO Todays Workout: " + databaseTodaysWorkout);
 		
 		// Change it to DTO
 		if (databaseTodaysWorkout.isPresent()) {
-			todaysWorkoutDTO = exerciseService.convertDomainToDTO(databaseTodaysWorkout);
+			todaysWorkoutDTO = exerciseService.convertDomainToDTO(databaseTodaysWorkout.get());
 		}
 		
 		System.out.println("Finished TodaysWorkoutDTO: " + databaseTodaysWorkout);
