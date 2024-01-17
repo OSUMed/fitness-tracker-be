@@ -9,6 +9,13 @@ import org.springframework.stereotype.Service;
 
 import com.srikanth.fitnesstrackerbe.domain.User;
 import com.srikanth.fitnesstrackerbe.domain.workout.Exercise;
+import com.srikanth.fitnesstrackerbe.domain.workout.CardioExercise;
+import com.srikanth.fitnesstrackerbe.domain.workout.CardioSet;
+import com.srikanth.fitnesstrackerbe.domain.workout.StretchSet;
+import com.srikanth.fitnesstrackerbe.domain.workout.StrengthSet;
+import com.srikanth.fitnesstrackerbe.domain.workout.StretchExercise;
+import com.srikanth.fitnesstrackerbe.domain.workout.ExerciseSet;
+import com.srikanth.fitnesstrackerbe.domain.workout.StrengthExercise;
 import com.srikanth.fitnesstrackerbe.domain.workout.TodaysWorkout;
 import com.srikanth.fitnesstrackerbe.repository.UserRepository;
 import com.srikanth.fitnesstrackerbe.repository.workout.ExerciseRepository;
@@ -28,7 +35,7 @@ public class ExerciseService {
 	@Autowired
 	private ExerciseRepository exerciseRepository;
 
-	public ExerciseDTO processExerciseData(Map<String, Object> fullExerciseData) {
+	public ExerciseDTO convertDataToExerciseDTO(Map<String, Object> fullExerciseData) {
 		Integer userId = (Integer) fullExerciseData.get("userId");
 		User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 		Date date = new Date((Long) fullExerciseData.get("date"));
@@ -45,21 +52,27 @@ public class ExerciseService {
 
 		String type = (String) exerciseData.get("type");
 		String exerciseName = (String) exerciseData.get("exercise_name");
-		System.out.println("type & exercise name: " + type + exerciseName);
 		@SuppressWarnings("unchecked")
 		List<Map<String, Object>> setsData = (List<Map<String, Object>>) exerciseData.get("sets");
-		System.out.println("processWorkoutData in set loop: " + type + " " + exerciseName + " " + setsData);
+		System.out.println("preExerciseDTO type & exercise name data: " + type + " & " + exerciseName);
+		System.out.println("preExerciseDTO set data: " + setsData);
 
 		ExerciseDTO exerciseDTO = null;
 		ObjectMapper mapper = new ObjectMapper();
-
+		System.out.println("preSwitch expression, type equals: " + type);
 		switch (type) {
 		case "Cardio":
 			List<CardioSetDTO> cardioSets = new ArrayList<>();
+			// Iterates over setsData with a for loop.
 			for (Map<String, Object> setData : setsData) {
+				// Converts each map in setsData into the appropriate SetDTO using ObjectMapper.
 				CardioSetDTO cardioSet = mapper.convertValue(setData, CardioSetDTO.class);
+				
+				// Adds each converted SetDTO to a list.
 				cardioSets.add(cardioSet);
 			}
+			System.out.println("Calling createCardioExerciseDTO...");
+			// Creates an ExerciseDTO with the list of set DTOs.
 			exerciseDTO = ExerciseDTO.createCardioExerciseDTO(null, exerciseName, cardioSets, userId, null);
 			break;
 		case "Strength":
@@ -68,6 +81,7 @@ public class ExerciseService {
 				StrengthSetDTO strengthSet = mapper.convertValue(setData, StrengthSetDTO.class);
 				strengthSets.add(strengthSet);
 			}
+			System.out.println("Calling createStrengthExerciseDTO...");
 			exerciseDTO = ExerciseDTO.createStrengthExerciseDTO(null, exerciseName, strengthSets, userId, null);
 			break;
 		case "Stretch":
@@ -76,21 +90,51 @@ public class ExerciseService {
 				StretchSetDTO stretchSet = mapper.convertValue(setData, StretchSetDTO.class);
 				stretchSets.add(stretchSet);
 			}
+			System.out.println("Calling createStretchExerciseDTO...");
 			exerciseDTO = ExerciseDTO.createStretchExerciseDTO(null, exerciseName, stretchSets, userId, null);
 			break;
 		default:
 			System.out.println("Unknown set type in setsData: " + type);
 		}
 
-		System.out.println("ProcessExercise final exerciseDTO: " + exerciseDTO);
+	
 		return exerciseDTO;
 
 	}
 
 	public Exercise convertExerciseDTOToExercise(ExerciseDTO exerciseDTO) {
-		return null;
-		
+		Exercise exercise;
+		Optional<User> user = userRepository.findById(exerciseDTO.getUserId());
+		if (!user.isPresent()) {
+			throw new RuntimeException("User not found");
+		}
+
+		// Determine the type of exercise and instantiate the correct subclass
+		switch (exerciseDTO.getType()) {
+		case "Cardio":
+			exercise = new CardioExercise();
+			break;
+		case "Strength":
+			exercise = new StrengthExercise();
+			break;
+		case "Stretch":
+			exercise = new StretchExercise();
+			break;
+		default:
+			throw new RuntimeException("Unknown exercise type: " + exerciseDTO.getType());
+		}
+
+		exercise.setUser(user.get());
+		exercise.setType(exerciseDTO.getType());
+		exercise.setExerciseName(exerciseDTO.getExerciseName());
+
+		List<ExerciseSet> exerciseSets = convertSetDTOsToExerciseSets(exerciseDTO.getSets(), exercise);
+		exercise.setSets(exerciseSets);
+
+		return exercise;
 	}
+
+	
 //	public TodaysWorkoutDTO addExercise(TodaysWorkoutDTO todaysWorkoutDTO) {
 //		// Convert exerciseDTO to domain entity if necessary
 //		TodaysWorkout todayWorkout = convertToEntity(todaysWorkoutDTO);
