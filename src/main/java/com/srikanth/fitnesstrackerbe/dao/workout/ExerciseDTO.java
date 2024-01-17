@@ -30,35 +30,38 @@ public abstract class ExerciseDTO {
 
     // Factory methods for each exercise type
     public static ExerciseDTO createCardioExerciseDTO(Long id, String exerciseName, List<CardioSetDTO> sets, Integer userId, ExerciseDetail exerciseDetail) {
-        CardioExerciseDTO cardioExerciseDTO = new CardioExerciseDTO("Cardio", exerciseName, sets);
+        CardioExerciseDTO cardioExerciseDTO = new CardioExerciseDTO();
         cardioExerciseDTO.setId(id);
         cardioExerciseDTO.setType("Cardio");
         cardioExerciseDTO.setExerciseName(exerciseName);
         cardioExerciseDTO.setSets(sets);
         cardioExerciseDTO.setUserId(userId);
         cardioExerciseDTO.setExerciseDetail(exerciseDetail);
+        System.out.println("Returning created createCardioExerciseDTO " + cardioExerciseDTO);
         return cardioExerciseDTO;
     }
 
     public static ExerciseDTO createStrengthExerciseDTO(Long id, String exerciseName, List<StrengthSetDTO> sets, Integer userId, ExerciseDetail exerciseDetail) {
-        StrengthExerciseDTO strengthExerciseDTO = new StrengthExerciseDTO("Strength", exerciseName, sets);
+        StrengthExerciseDTO strengthExerciseDTO = new StrengthExerciseDTO();
         strengthExerciseDTO.setId(id);
         strengthExerciseDTO.setType("Strength");
         strengthExerciseDTO.setExerciseName(exerciseName);
         strengthExerciseDTO.setSets(sets);
         strengthExerciseDTO.setUserId(userId);
         strengthExerciseDTO.setExerciseDetail(exerciseDetail);
+        System.out.println("Returning created strengthExerciseDTO " + strengthExerciseDTO);
         return strengthExerciseDTO;
     }
 
     public static ExerciseDTO createStretchExerciseDTO(Long id, String exerciseName, List<StretchSetDTO> sets, Integer userId, ExerciseDetail exerciseDetail) {
-        StretchExerciseDTO stretchExerciseDTO = new StretchExerciseDTO("Stretch", exerciseName, sets);
+        StretchExerciseDTO stretchExerciseDTO = new StretchExerciseDTO();
         stretchExerciseDTO.setId(id);
         stretchExerciseDTO.setType("Stretch");
         stretchExerciseDTO.setExerciseName(exerciseName);
         stretchExerciseDTO.setSets(sets);
         stretchExerciseDTO.setUserId(userId);
         stretchExerciseDTO.setExerciseDetail(exerciseDetail);
+        System.out.println("Returning created stretchExerciseDTO " + stretchExerciseDTO);
         return stretchExerciseDTO;
     }
 	public ExerciseDetail getExerciseDetail() {
