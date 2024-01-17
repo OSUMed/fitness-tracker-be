@@ -50,7 +50,7 @@ public class WorkoutLoginController {
 //	}
 
 	@PostMapping("/workoutlogins")
-	public ResponseEntity<TodaysWorkout> addWorkout(@RequestBody Map<String, Object> workoutData) {
+	public ResponseEntity<TodaysWorkoutDTO> addWorkout(@RequestBody Map<String, Object> workoutData) {
 	    System.out.println("Received workout data: " + workoutData);
 
 	    @SuppressWarnings("unchecked")
@@ -61,7 +61,9 @@ public class WorkoutLoginController {
 	    System.out.println("User ID: " + userId);
 	    System.out.println("Exercise Data: " + exerciseData);
 	    TodaysWorkout savedTodaysWorkout = todaysWorkoutTableService.processTodaysWorkoutData(workoutData);
-	    TodaysWorkout todaysWorkoutDTO = todaysWorkoutTableService.returnTodaysWorkoutData(savedTodaysWorkout);
+	    TodaysWorkoutDTO todaysWorkoutDTO = todaysWorkoutTableService.returnTodaysWorkoutData(savedTodaysWorkout);
+	    
+	    System.out.println("Client Sent DTO: " + todaysWorkoutDTO);
 	    return ResponseEntity.ok(todaysWorkoutDTO);
 //        return ResponseEntity.ok(new TodaysWorkout());
 	}
