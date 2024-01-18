@@ -1,5 +1,8 @@
 package com.srikanth.fitnesstrackerbe.web;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,10 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.srikanth.fitnesstrackerbe.dao.workout.ExerciseDTO;
@@ -23,6 +29,8 @@ import com.srikanth.fitnesstrackerbe.domain.workout.TodaysWorkout;
 import com.srikanth.fitnesstrackerbe.service.UserService;
 import com.srikanth.fitnesstrackerbe.service.workout.ExerciseService;
 import com.srikanth.fitnesstrackerbe.service.workout.TodaysWorkoutTableService;
+import com.srikanth.fitnesstrackerbe.service.workout.TodaysWorkoutTableService.ExerciseNotFoundException;
+import com.srikanth.fitnesstrackerbe.service.workout.TodaysWorkoutTableService.NoWorkoutFoundException;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -106,6 +114,33 @@ public class WorkoutLoginController {
 		} else {
 			System.out.println("REJECTED @PostMapping(workoutlogins): ");
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		}
+	}
+
+	@DeleteMapping("/workoutlogins/{exerciseId}")
+	public ResponseEntity<?> deleteTodaysWorkout(@PathVariable Integer exerciseId,
+			@RequestParam String rawWorkoutDate) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+		if (authentication != null && authentication.isAuthenticated()) {
+			try {
+				String userName = authentication.getName();
+				User loggedInUser = (User) userService.loadUserByUsername(userName);
+				Integer userId = loggedInUser.getId();
+				TodaysWorkoutDTO todaysWorkoutDTO = todaysWorkoutTableService.deleteExerciseFromTodaysWorkout(userId,
+						exerciseId);
+				return ResponseEntity.ok(todaysWorkoutDTO);
+
+			} catch (NoWorkoutFoundException | ExerciseNotFoundException e) {
+				System.out.println(e.getMessage());
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+			} catch (DateTimeParseException e) {
+				System.out.println("Error parsing the workout date: " + e.getMessage());
+				return ResponseEntity.badRequest().body("Invalid date format: " + rawWorkoutDate);
+			}
+		} else {
+			System.out.println("Authentication failed for delete request.");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // Not authenticated or authorized
 		}
 	}
 
