@@ -146,17 +146,20 @@ public class TodaysWorkoutTableService {
 		java.sql.Date sqlDate = new java.sql.Date(todayDate.getTime());
 
 		// Get Saved Exercise data to update:
+		System.out.println("User Id is: " + userId);
 		Optional<TodaysWorkout> existingWorkout = todaysWorkoutRepository.findByUserIdAndDate(userId, sqlDate);
 		TodaysWorkout todaysWorkout=null;
 		if (existingWorkout.isPresent()) {
 			todaysWorkout = existingWorkout.get();
 		}
+		System.out.println("Returned Repo with userId Id is: " + userId + todaysWorkout);
 
 		// Add the exercise to today's workout
 //		exercise.setWorkout(todaysWorkout);
 //		todaysWorkout.getExercises().add(exercise);
 		// Update data:
 		TodaysWorkout updatedTodaysWorkout = updateExerciseInTodaysWorkout(exerciseWithNewData, todaysWorkout);
+		System.out.println("processTodaysWorkoutUpdateData: Item being saved to repo is: " + updatedTodaysWorkout);
 		TodaysWorkout savedTodaysWorkout = todaysWorkoutRepository.save(updatedTodaysWorkout);
 	  // Convert to DTO and return
 	    return returnTodaysWorkoutData(savedTodaysWorkout);
