@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -142,6 +143,33 @@ public class WorkoutLoginController {
 			System.out.println("Authentication failed for delete request.");
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // Not authenticated or authorized
 		}
+	}
+
+	@PutMapping("/workoutlogins/{exerciseId}")
+	public ResponseEntity<TodaysWorkoutDTO> addWorkout(@RequestBody Map<String, Object> workoutData,
+			@PathVariable Integer exerciseId) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+		if (authentication != null && authentication.isAuthenticated()) {
+			try {
+				String userName = authentication.getName();
+				User loggedInUser = (User) userService.loadUserByUsername(userName);
+				Integer userId = loggedInUser.getId();
+
+				// Make data into the updated DTO and return it:
+				TodaysWorkoutDTO updatedExerciseDTO = todaysWorkoutTableService
+						.processTodaysWorkoutUpdateData(workoutData, userId);
+				return ResponseEntity.ok(updatedExerciseDTO);
+
+			} catch (NoWorkoutFoundException | ExerciseNotFoundException e) {
+				System.out.println(e.getMessage());
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+			}
+		} else {
+			System.out.println("Authentication failed for delete request.");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // Not authenticated or authorized
+		}
+
 	}
 
 }
