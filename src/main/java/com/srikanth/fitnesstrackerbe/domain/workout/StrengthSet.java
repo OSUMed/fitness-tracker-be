@@ -1,5 +1,7 @@
 package com.srikanth.fitnesstrackerbe.domain.workout;
 
+import com.srikanth.fitnesstrackerbe.dao.workout.ExerciseSetDTO;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -7,72 +9,39 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
-
 @Entity
-public class StrengthSet {
+public class StrengthSet extends ExerciseSet {
+	private String reps;
+	private String weight;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	public StrengthSet() {
+	}
 
-    private String reps;
-    private String weight;
+	public StrengthSet(String reps, String weight) {
+		this.reps = reps;
+		this.weight = weight;
+	}
 
-    @ManyToOne
-    @JoinColumn(name = "strength_id")
-    private Strength strength;
+	public String getReps() {
+		return reps;
+	}
 
-    // Constructors
-    public StrengthSet() {
-    }
+	public void setReps(String reps) {
+		this.reps = reps;
+	}
 
-    public StrengthSet(String reps, String weight, Strength strength) {
-        this.reps = reps;
-        this.weight = weight;
-        this.strength = strength;
-    }
+	public String getWeight() {
+		return weight;
+	}
 
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
+	public void setWeight(String weight) {
+		this.weight = weight;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	@Override
+	public String toString() {
+		return "StrengthSet [reps=" + reps + ", weight=" + weight + "]";
+	}
 
-    public String getReps() {
-        return reps;
-    }
 
-    public void setReps(String reps) {
-        this.reps = reps;
-    }
-
-    public String getWeight() {
-        return weight;
-    }
-
-    public void setWeight(String weight) {
-        this.weight = weight;
-    }
-
-    public Strength getStrength() {
-        return strength;
-    }
-
-    public void setStrength(Strength strength) {
-        this.strength = strength;
-    }
-
-    // toString method
-    @Override
-    public String toString() {
-        return "StrengthSet{" +
-                "id=" + id +
-                ", reps='" + reps + '\'' +
-                ", weight='" + weight + '\'' +
-                ", strength=" + strength +
-                '}';
-    }
 }

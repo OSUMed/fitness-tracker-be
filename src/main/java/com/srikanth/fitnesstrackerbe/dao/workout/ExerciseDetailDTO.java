@@ -1,4 +1,4 @@
-package com.srikanth.fitnesstrackerbe.domain.workout;
+package com.srikanth.fitnesstrackerbe.dao.workout;
 
 import java.util.List;
 
@@ -14,11 +14,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import com.srikanth.fitnesstrackerbe.domain.User;
 
-@Entity
-public class ExerciseDetail {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class ExerciseDetailDTO {
+
     private Long id;
 
     private String type; // Strength, Cardio, Stretch
@@ -30,17 +28,15 @@ public class ExerciseDetail {
     private String difficulty; // For Stretch
     private String infoLink;
     private String notes;
-	@Column
 	private Integer userId;
 
     // One-to-Many relationship with Exercise
-    @OneToMany(mappedBy = "exerciseDetail", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Exercise> exercises;
+     private List<ExerciseDTO> exercises;
 
     // Constructors
-    public ExerciseDetail() {}
+    public ExerciseDetailDTO() {}
 
-    public ExerciseDetail(String type, String name, String muscle, Integer duration, Double distance, 
+    public ExerciseDetailDTO(String type, String name, String muscle, Integer duration, Double distance, 
                           String intensity, String difficulty, String infoLink, String notes) {
         this.type = type;
         this.name = name;
@@ -141,11 +137,11 @@ public class ExerciseDetail {
 		this.notes = notes;
 	}
 
-	public List<Exercise> getExercises() {
+	public List<ExerciseDTO> getExercises() {
 		return exercises;
 	}
 
-	public void setExercises(List<Exercise> exercises) {
+	public void setExercises(List<ExerciseDTO> exercises) {
 		this.exercises = exercises;
 	}
 
