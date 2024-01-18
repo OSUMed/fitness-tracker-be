@@ -15,6 +15,7 @@
 	<description>Backend for Fitness Tracker</description>
 	<properties>
 		<java.version>17</java.version>
+		<versions.java-security-toolkit>1.1.1</versions.java-security-toolkit>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -78,6 +79,10 @@
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-actuator</artifactId>
 </dependency>
+		<dependency>
+			<groupId>io.github.pixee</groupId>
+			<artifactId>java-security-toolkit</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -96,5 +101,13 @@
 			</plugin>
 		</plugins>
 	</build>
-
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>io.github.pixee</groupId>
+				<artifactId>java-security-toolkit</artifactId>
+				<version>${versions.java-security-toolkit}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>
