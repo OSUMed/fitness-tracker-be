@@ -10,7 +10,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.srikanth.fitnesstrackerbe.domain.User;
+import com.srikanth.fitnesstrackerbe.domain.workout.CardioSet;
 import com.srikanth.fitnesstrackerbe.domain.workout.Exercise;
+import com.srikanth.fitnesstrackerbe.domain.workout.ExerciseSet;
+import com.srikanth.fitnesstrackerbe.domain.workout.StrengthSet;
+import com.srikanth.fitnesstrackerbe.domain.workout.StretchSet;
 import com.srikanth.fitnesstrackerbe.domain.workout.TodaysWorkout;
 import com.srikanth.fitnesstrackerbe.repository.UserRepository;
 import com.srikanth.fitnesstrackerbe.repository.workout.TodaysWorkoutRepository;
@@ -128,6 +132,98 @@ public class TodaysWorkoutTableService {
 		public ExerciseNotFoundException(String message) {
 			super(message);
 		}
+	}
+
+	public TodaysWorkoutDTO processTodaysWorkoutUpdateData(Map<String, Object> fullExerciseData, Integer userId) {
+		// Make Data to Exercise:
+		ExerciseDTO exerciseDTO = exerciseService.convertDataToExerciseDTO(fullExerciseData);
+		System.out.println(
+				"UPDATE final exerciseDTO: " + exerciseDTO + " exerciseDTO's userId: " + exerciseDTO.getUserId());
+		Exercise exerciseWithNewData = exerciseService.convertExerciseDTOToExercise(exerciseDTO);
+		System.out.println("UPDATE exercise domain: " + exerciseWithNewData);
+
+		java.util.Date todayDate = new java.util.Date();
+		java.sql.Date sqlDate = new java.sql.Date(todayDate.getTime());
+
+		// Get Saved Exercise data to update:
+		System.out.println("User Id is: " + userId);
+		Optional<TodaysWorkout> existingWorkout = todaysWorkoutRepository.findByUserIdAndDate(userId, sqlDate);
+		TodaysWorkout todaysWorkout=null;
+		if (existingWorkout.isPresent()) {
+			todaysWorkout = existingWorkout.get();
+		}
+		System.out.println("Returned Repo with userId Id is: " + userId + todaysWorkout);
+
+		// Add the exercise to today's workout
+//		exercise.setWorkout(todaysWorkout);
+//		todaysWorkout.getExercises().add(exercise);
+		// Update data:
+		TodaysWorkout updatedTodaysWorkout = updateExerciseInTodaysWorkout(exerciseWithNewData, todaysWorkout);
+		System.out.println("processTodaysWorkoutUpdateData: Item being saved to repo is: " + updatedTodaysWorkout);
+		TodaysWorkout savedTodaysWorkout = todaysWorkoutRepository.save(updatedTodaysWorkout);
+	  // Convert to DTO and return
+	    return returnTodaysWorkoutData(savedTodaysWorkout);
+	}
+
+	private TodaysWorkout updateExerciseInTodaysWorkout(Exercise exerciseWithNewData, TodaysWorkout todaysWorkout) {
+	    List<Exercise> todaysExercises = todaysWorkout.getExercises();
+	    Exercise exerciseToUpdate = todaysExercises.stream()
+	            .filter(exercise -> exercise.getId().equals(exerciseWithNewData.getId()))
+	            .findFirst()
+	            .orElse(null);
+
+	    if (exerciseToUpdate != null) {
+	        System.out.println("Exercise found in updateExerciseInTodaysWorkout: " + exerciseToUpdate);
+	        exerciseToUpdate.setExerciseDetail(exerciseWithNewData.getExerciseDetail());
+	        exerciseToUpdate.setExerciseName(exerciseWithNewData.getExerciseName());
+	        exerciseToUpdate.setType(exerciseWithNewData.getType());
+	        String exerciseType = exerciseToUpdate.getType();
+	        updateExerciseSets(exerciseToUpdate, exerciseWithNewData, exerciseType);
+	    } else {
+	        System.out.println("No exercise found to update.");
+	    }
+
+	    return todaysWorkout;
+	}
+
+
+	private void updateExerciseSets(Exercise exerciseToUpdate, Exercise exerciseWithUpdatedData, String exerciseType) {
+		for (ExerciseSet existingSet : exerciseToUpdate.getSets()) {
+			ExerciseSet sourceSetForUpdate = findMatchingSet(existingSet, exerciseWithUpdatedData.getSets());
+			if (sourceSetForUpdate != null) {
+				switch (exerciseType) {
+				case "Strength":
+					updateStrengthSetDetails((StrengthSet) existingSet, (StrengthSet) sourceSetForUpdate);
+					break;
+				case "Cardio":
+					updateCardioSetDetails((CardioSet) existingSet, (CardioSet) sourceSetForUpdate);
+					break;
+				case "Stretch":
+					updateStretchSetDetails((StretchSet) existingSet, (StretchSet) sourceSetForUpdate);
+					break;
+				default:
+					throw new IllegalArgumentException("Unknown exercise type: " + exerciseType);
+				}
+			}
+		}
+	}
+
+	private ExerciseSet findMatchingSet(ExerciseSet existingSet, List<ExerciseSet> sourceSetsWithUpdates) {
+		return sourceSetsWithUpdates.stream().filter(sourceSet -> sourceSet.getId().equals(existingSet.getId()))
+				.findFirst().orElse(null);
+	}
+
+	private void updateStrengthSetDetails(StrengthSet existingSet, StrengthSet sourceSet) {
+		existingSet.setReps(sourceSet.getReps());
+		existingSet.setWeight(sourceSet.getWeight());
+	}
+
+	private void updateCardioSetDetails(CardioSet existingSet, CardioSet sourceSet) {
+		existingSet.setDistance(sourceSet.getDistance());
+	}
+
+	private void updateStretchSetDetails(StretchSet existingSet, StretchSet sourceSet) {
+		existingSet.setSeconds(sourceSet.getSeconds());
 	}
 
 }

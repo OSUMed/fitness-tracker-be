@@ -55,74 +55,101 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter implements App
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-	        throws ServletException, IOException {
-//		if (true) {
-//			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-//			logger.info("Writing response TRUE e2 message...");
-//	        response.getWriter().write("{\"error\":\"DAED TEST Unauthorized access. Please log in again.\"}");
-//	        return;
-//		}
-	    String authHeader = request.getHeader("Authorization");
-	    Cookie refreshTokenCookie = findCookie(request, "refreshToken");
-	    if (StringUtils.hasText(authHeader)) {
-	        String accessToken = authHeader.substring(7);
-	        
-	        if (accessToken != null) {
-	            try {
-	                String username = jwtService.getSubject(accessToken);
-	                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			throws ServletException, IOException {
+		String authHeader = request.getHeader("Authorization");
+		Cookie refreshTokenCookie = findCookie(request, "refreshToken");
+		if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
+			String accessToken = authHeader.substring(7);
+			if (accessToken != null) {
+				processTokenAuthentication(accessToken, request, response, filterChain);
 
-	                if (StringUtils.hasText(username) && authentication == null) {
-	                    if (jwtService.isTokenValid(accessToken, getUserDetails(username))) {
-	                        setAuthenticationInContext(username);
-	                    }
-	                }
-	            } catch (ExpiredJwtException e) {
-	                // Handle access token expiration
-	                handleAccessTokenExpiration(response, refreshTokenCookie);
-	            } catch (Exception e) {
-	                // General unauthorized error
-	                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-	                response.setHeader("Authorization-Error", "true");
-	                response.getWriter().write("{\"error\":\"Unauthorized access. Please log in again.\"}");
-	                return;
-	            }
-	        }
-	    } 
-	    filterChain.doFilter(request, response);
+				try {
+					System.out.println("We are checking if token is expired!");
+					String username = jwtService.getSubject(accessToken);
+					Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+					if (StringUtils.hasText(username) && authentication == null) {
+						if (jwtService.isTokenValid(accessToken, getUserDetails(username))) {
+							setAuthenticationInContext(username);
+							filterChain.doFilter(request, response);
+							return;
+						}
+					}
+				} catch (ExpiredJwtException e) {
+					// Handle access token expiration
+					System.out.println("ExpiredJwtException: We are checking if token is expired!");
+					handleAccessTokenExpiration(response, refreshTokenCookie);
+					return;
+				} catch (Exception e) {
+					System.out.println("ExpiredJwtException, Exception: We are checking if token is expired!");
+					// General unauthorized error
+					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+					response.setHeader("Authorization-Error", "true");
+					response.getWriter().write("{\"error\":\"Unauthorized access. Please log in again.\"}");
+					return;
+				}
+			}
+		}
+
+		filterChain.doFilter(request, response);
 	}
 
-	private void handleAccessTokenExpiration(HttpServletResponse response, Cookie refreshTokenCookie) throws IOException {
-	    try {
- 	        String newToken = refreshAccessToken(refreshTokenCookie);
-	        response.setHeader("Authorization-Refresh", newToken); // Set new token in response
-	        setAuthenticationInContext(jwtService.getSubject(newToken));
-	    } catch (IllegalArgumentException e2) {
-	        if (e2.getMessage().startsWith("Refresh Token has expired for user: ")) {
-	            String username = e2.getMessage().split("user: ")[1];
-	 	        refreshTokenService.deleteRefreshTokenByUsername(username);
-	 	        Cookie clearCookie = CookieUtils.clearServletCookie("refreshToken");
-	 	        response.addCookie(clearCookie);
+	private void processTokenAuthentication(String accessToken, HttpServletRequest request,
+			HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
 
-	 	        // Return a 401 response with the redirectToLogin flag
-	 	        response.setHeader("Refresh-Token-Expired", "true");
-	 	        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-	 	        response.setContentType("application/json");
-	 	        logger.info("Writing response IllegalArgumentException e2 message...");
-	 	        response.getWriter().write("{\"error\":\"Session expired. Please log in again.\", \"redirectToLogin\":true}");
-	 	       return;
-	        }
-	    } catch (Exception e1) {
-	        // Other exceptions during token refresh
-	    	logger.info("Writing response Exception e1 message...");
-	    	response.setHeader("Authorization-Error", "true");
-	        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-	        response.getWriter().write("{\"error\":\"Error processing token. Please log in again.\"}");
-	        return;
-	    }
 	}
 
-	
+	private void handleAccessTokenExpiration(HttpServletResponse response, Cookie refreshTokenCookie)
+			throws IOException {
+		try {
+			String newToken = refreshAccessToken(refreshTokenCookie);
+			response.setHeader("Authorization-Refresh", newToken); // Set new token in response
+			setAuthenticationInContext(jwtService.getSubject(newToken));
+			System.out.println("handleAccessTokenExpiration: new token is- " + newToken);
+		} catch (IllegalArgumentException e2) {
+			if (e2.getMessage().startsWith("Refresh Token has expired for user: ")) {
+				handleExpiredRefreshToken(e2, response);
+//	            String username = e2.getMessage().split("user: ")[1];
+//	 	        refreshTokenService.deleteRefreshTokenByUsername(username);
+//	 	        Cookie clearCookie = CookieUtils.clearServletCookie("refreshToken");
+//	 	        response.addCookie(clearCookie);
+//
+//	 	        // Return a 401 response with the redirectToLogin flag
+//	 	        response.setHeader("Refresh-Token-Expired", "true");
+//	 	        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//	 	        response.setContentType("application/json");
+//	 	        logger.info("Writing response IllegalArgumentException e2 message...");
+//	 	        response.getWriter().write("{\"error\":\"Session expired. Please log in again.\", \"redirectToLogin\":true}");
+				return;
+			}
+		} catch (Exception e1) {
+			// Other exceptions during token refresh
+			handleOtherExceptions(e1, response);
+			return;
+		}
+	}
+
+	private void handleExpiredRefreshToken(IllegalArgumentException e2, HttpServletResponse response)
+			throws IOException {
+		String username = e2.getMessage().split("user: ")[1];
+		refreshTokenService.deleteRefreshTokenByUsername(username);
+		Cookie clearCookie = CookieUtils.clearServletCookie("refreshToken");
+		response.addCookie(clearCookie);
+
+		// Set response for expired refresh token
+		response.setHeader("Refresh-Token-Expired", "true");
+		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		response.setContentType("application/json");
+		logger.info("Writing response IllegalArgumentException e2 message...");
+		response.getWriter().write("{\"error\":\"Session expired. Please log in again.\", \"redirectToLogin\":true}");
+	}
+
+	private void handleOtherExceptions(Exception e1, HttpServletResponse response) throws IOException {
+		logger.info("Writing response Exception e1 message...");
+		response.setHeader("Authorization-Error", "true");
+		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		response.getWriter().write("{\"error\":\"Error processing token. Please log in again.\"}");
+	}
 
 	private UserDetails getUserDetails(String username) {
 		UserDetailsService userDetailsService = applicationContext.getBean(UserDetailsService.class);
@@ -143,12 +170,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter implements App
 	}
 
 	private void setAuthenticationInContext(String username) {
-		// Create final UsernamePasswordAuthenticationToken token. Then set it into security context
+		// Create final UsernamePasswordAuthenticationToken token. Then set it into
+		// security context
 		// Notice we add user's roles here so spring security can check against it later
 		UserDetails userDetails = getUserDetails(username);
 		UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null,
 				userDetails.getAuthorities());
-		
+
 		// Create and then set the authToken into the security context:
 		SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
 		securityContext.setAuthentication(authToken);

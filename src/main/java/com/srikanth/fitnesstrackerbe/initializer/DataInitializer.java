@@ -35,5 +35,11 @@ public class DataInitializer implements CommandLineRunner {
             adminUser.setAuthorities(new HashSet<>(Collections.singletonList(roleAdmin)));
             userRepository.save(adminUser);
         }
+        Optional<User> guestUserOpt = userRepository.findByUsername("guest");
+        if (!guestUserOpt.isPresent()) {
+            User adminUser = new User("guest", "guestlogin"); 
+            adminUser.setAuthorities(new HashSet<>(Collections.singletonList(roleUser)));
+            userRepository.save(adminUser);
+        }
     }
 }

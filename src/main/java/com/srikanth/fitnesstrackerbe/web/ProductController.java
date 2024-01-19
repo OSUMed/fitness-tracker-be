@@ -38,7 +38,7 @@ public class ProductController {
     	System.out.println("We reached free endpoint!");
     	return ResponseEntity.ok( allProducts );
     }
-    @GetMapping("/free2")
+    @GetMapping("/free")
     public ResponseEntity<List<Product>> getFree2 () {
         return ResponseEntity.ok( allProducts );
     }

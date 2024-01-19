@@ -35,7 +35,7 @@ public class JwtService {
      */
     @Value("${jwt.signingKey}")
     private String jwtSigningKey;
-    @Value("${jwt.expirationTimeInMillis}")
+    @Value("${jwt.accessTokenExpirationTimeInMillis}")
     private Long expirationTimeInMillis;
     
     public String generateToken(Map<String, Object> claims, UserDetails user) {
@@ -67,11 +67,34 @@ public class JwtService {
         return subject;
     }
     
-    public Boolean isTokenValid (String token, UserDetails user) {
+    public Boolean isTokenValid(String token, UserDetails user) {
         String subject = getSubject(token);
         Date expirationDate = extractClaim(token, Claims::getExpiration);
-        return user.getUsername().equalsIgnoreCase(subject) && new Date().before(expirationDate);
+        Date currentDate = new Date();
+
+        // Calculate the time remaining until token expiration in milliseconds
+        long timeRemaining = expirationDate.getTime() - currentDate.getTime();
+
+        // Convert milliseconds to seconds for easier reading
+        long secondsRemaining = timeRemaining / 1000;
+
+        System.out.println("JWT Token Validation Check:");
+        System.out.println("  - JWT Token Subject: " + subject);
+        System.out.println("  - User Username: " + user.getUsername());
+        System.out.println("  - Token Expiration Date: " + expirationDate);
+        System.out.println("  - Current Date: " + currentDate);
+        System.out.println("  - Seconds Remaining Until Token Expiration: " + secondsRemaining);
+
+        boolean isUsernameMatch = user.getUsername().equalsIgnoreCase(subject);
+        boolean isTokenNotExpired = currentDate.before(expirationDate);
+
+        System.out.println("  - Is Username Match: " + isUsernameMatch);
+        System.out.println("  - Is JWT Token Not Expired: " + isTokenNotExpired);
+
+        return isUsernameMatch && isTokenNotExpired;
     }
+
+
     
     private <R> R extractClaim (String token, Function<Claims, R> claimsExtract) {
         Claims allClaims = extractAllClaims(token);
