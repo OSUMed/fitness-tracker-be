@@ -1,10 +1,14 @@
 package com.srikanth.fitnesstrackerbe.security;
 
 import java.io.IOException;
+import java.util.Date;
+import java.util.Optional;
 
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.srikanth.fitnesstrackerbe.dao.request.RefreshTokenRequest;
+import com.srikanth.fitnesstrackerbe.domain.RefreshToken;
+import com.srikanth.fitnesstrackerbe.repository.RefreshTokenRepository;
 import com.srikanth.fitnesstrackerbe.service.JwtService;
 import com.srikanth.fitnesstrackerbe.service.RefreshTokenService;
 
@@ -41,7 +45,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter implements App
 	private JwtService jwtService;
 	private ApplicationContext applicationContext;
 	private RefreshTokenService refreshTokenService;
-
+	@Autowired
+	private RefreshTokenRepository refreshTokenRepository;
 	// Requests:
 	// Headers -> key/value pairs (Authorization -> Bearer xxx.yyy.zzz)
 	// Body -> (if JSON) key/value pairs
@@ -58,6 +63,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter implements App
 			throws ServletException, IOException {
 		String authHeader = request.getHeader("Authorization");
 		Cookie refreshTokenCookie = findCookie(request, "refreshToken");
+		if (refreshTokenCookie != null) {
+			String cookieValue = refreshTokenCookie.getValue();
+			Optional<RefreshToken> refreshTokenOpt = refreshTokenRepository.findByRefreshToken(cookieValue);
+			if (refreshTokenOpt.isPresent()) {
+				RefreshToken refreshToken = refreshTokenOpt.get();
+				long expirationTimeMillis = refreshToken.getExpirationDate().getTime();
+				long currentTimeMillis = System.currentTimeMillis();
+				long remainingTimeMillis = expirationTimeMillis - currentTimeMillis;
+				System.out.println("Refresh Token Validation Check:");
+				System.out.println("  - Refresh Token Expiration Date: " + refreshToken.getExpirationDate());
+				System.out.println("  - Current Time: " + new Date(currentTimeMillis));
+				System.out.println("  - Milliseconds Remaining Until Token Expiration: " + remainingTimeMillis);
+				System.out.println("  - Seconds Remaining Until Token Expiration: " + remainingTimeMillis / 1000);
+			}
+		}
 		if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
 			String accessToken = authHeader.substring(7);
 			if (accessToken != null) {
@@ -77,11 +97,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter implements App
 					}
 				} catch (ExpiredJwtException e) {
 					// Handle access token expiration
-					System.out.println("ExpiredJwtException: We are checking if token is expired!");
+					logger.info("ExpiredJwtException: JWT expired, attempt to refresh using refresh token" + e);
 					handleAccessTokenExpiration(response, refreshTokenCookie);
 					return;
 				} catch (Exception e) {
-					System.out.println("ExpiredJwtException, Exception: We are checking if token is expired!");
+					logger.info(
+							"ExpiredJwtException, Exception: JWT expired, create Authorization-Error Custom Header");
 					// General unauthorized error
 					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 					response.setHeader("Authorization-Error", "true");

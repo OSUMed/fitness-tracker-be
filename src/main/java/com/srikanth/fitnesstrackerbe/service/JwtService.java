@@ -84,6 +84,8 @@ public class JwtService {
         System.out.println("  - Token Expiration Date: " + expirationDate);
         System.out.println("  - Current Date: " + currentDate);
         System.out.println("  - Seconds Remaining Until Token Expiration: " + secondsRemaining);
+        
+
 
         boolean isUsernameMatch = user.getUsername().equalsIgnoreCase(subject);
         boolean isTokenNotExpired = currentDate.before(expirationDate);
