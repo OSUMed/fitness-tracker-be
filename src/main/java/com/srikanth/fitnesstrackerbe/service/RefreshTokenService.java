@@ -56,16 +56,45 @@ public class RefreshTokenService {
 		return new Date(System.currentTimeMillis() + refreshTokenExpirationTimeInMillis);
 	}
 
-    public String createNewAccessToken(RefreshTokenRequest refreshTokenRequest) {
-        Optional<RefreshToken> refreshTokenOpt = refreshTokenRepository.findByRefreshToken(refreshTokenRequest.refreshToken());
-        // TODO: write code to check that the RefreshToken hasn't expired
-        String accessToken = refreshTokenOpt.map(RefreshTokenService::isNonExpired)
-                .map(refreshToken -> jwtService.generateToken(new HashMap<>(), refreshToken.getUser()))
-                .orElseThrow(() -> new IllegalArgumentException("Refresh token not found"));
-        
-        return accessToken;
-        
-    }
+//    public String createNewAccessToken(RefreshTokenRequest refreshTokenRequest) {
+//        Optional<RefreshToken> refreshTokenOpt = refreshTokenRepository.findByRefreshToken(refreshTokenRequest.refreshToken());
+//        // TODO: write code to check that the RefreshToken hasn't expired
+//        String accessToken = refreshTokenOpt.map(RefreshTokenService::isNonExpired)
+//                .map(refreshToken -> jwtService.generateToken(new HashMap<>(), refreshToken.getUser()))
+//                .orElseThrow(() -> new IllegalArgumentException("Refresh token not found"));
+//        
+//        return accessToken;
+//        
+//    }
+	public String createNewAccessToken(RefreshTokenRequest refreshTokenRequest) {
+	    System.out.println("Attempting to create a new access token with refresh token: " + refreshTokenRequest.refreshToken());
+	    
+	    Optional<RefreshToken> refreshTokenOpt = refreshTokenRepository.findByRefreshToken(refreshTokenRequest.refreshToken());
+
+	    if (!refreshTokenOpt.isPresent()) {
+	        System.out.println("Refresh token not found in the repository.");
+	        throw new IllegalArgumentException("Refresh token not found");
+	    }
+
+	    String accessToken = refreshTokenOpt.map(refreshToken -> {
+	        System.out.println("Found refresh token for user: " + refreshToken.getUser().getUsername());
+	        try {
+	            RefreshTokenService.isNonExpired(refreshToken);
+	            System.out.println("Refresh token is valid and not expired.");
+	            return jwtService.generateToken(new HashMap<>(), refreshToken.getUser());
+	        } catch (IllegalArgumentException e) {
+	            System.out.println("Refresh token has expired. Exception: " + e.getMessage());
+	            throw e;
+	        }
+	    }).orElseThrow(() -> {
+	        System.out.println("Failed to generate a new access token as the refresh token is missing or invalid.");
+	        return new IllegalArgumentException("Refresh token not found");
+	    });
+
+	    System.out.println("Successfully generated a new access token.");
+	    return accessToken;
+	}
+
     
     /**
      * Calculate the remaining time in milliseconds until the refresh token expires.
@@ -76,17 +105,45 @@ public class RefreshTokenService {
     public long getRemainingTimeForRefreshToken(RefreshToken refreshToken) {
         long expirationTimeMillis = refreshToken.getExpirationDate().getTime();
         long currentTimeMillis = System.currentTimeMillis();
-        return expirationTimeMillis - currentTimeMillis;
-    }
+        long remainingTimeMillis = expirationTimeMillis - currentTimeMillis;
 
+        System.out.println("Refresh Token Validation Check:");
+        System.out.println("  - Refresh Token Expiration Date: " + refreshToken.getExpirationDate());
+        System.out.println("  - Current Time: " + new Date(currentTimeMillis));
+        System.out.println("  - Milliseconds Remaining Until Token Expiration: " + remainingTimeMillis);
+        System.out.println("  - Seconds Remaining Until Token Expiration: " + remainingTimeMillis / 1000);
+
+        return remainingTimeMillis;
+    }
     
     private static RefreshToken isNonExpired(RefreshToken refreshToken) {
         if (refreshToken.getExpirationDate().after(new Date())) {
             return refreshToken;
         } else {
+            System.out.println("Refresh Token Expiration Check:");
+            System.out.println("  - Token Expiration Date: " + refreshToken.getExpirationDate());
+            System.out.println("  - Current Time: " + new Date());
+            System.out.println("  - Token has expired for user: " + refreshToken.getUser().getUsername());
+
             throw new IllegalArgumentException("Refresh Token has expired for user: " + refreshToken.getUser().getUsername());
         }
     }
+
+
+//    public long getRemainingTimeForRefreshToken(RefreshToken refreshToken) {
+//        long expirationTimeMillis = refreshToken.getExpirationDate().getTime();
+//        long currentTimeMillis = System.currentTimeMillis();
+//        return expirationTimeMillis - currentTimeMillis;
+//    }
+
+    
+//    private static RefreshToken isNonExpired(RefreshToken refreshToken) {
+//        if (refreshToken.getExpirationDate().after(new Date())) {
+//            return refreshToken;
+//        } else {
+//            throw new IllegalArgumentException("Refresh Token has expired for user: " + refreshToken.getUser().getUsername());
+//        }
+//    }
 
 
 //    public void deleteRefreshToken(User loggedInUser) {
