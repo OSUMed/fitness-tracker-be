@@ -44,7 +44,7 @@ public class SecurityConfiguration {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-	    String[] pathsPermitAll = { "/api/v1/users", "/workouts/**", "/api/logout", "/actuator/**", "/account", "/allusers", "/refreshtoken", "/tryme", "/api/v1/users/**", "/h2-console/**", "/srikanth", "/register", "/login" };
+	    String[] pathsPermitAll = { "/api/v1/users", "/workouts/**", "/free", "/api/logout", "/actuator/**", "/account", "/allusers", "/refreshtoken", "/tryme", "/api/v1/users/**", "/h2-console/**", "/srikanth", "/register", "/login" };
 	    http    // Apply CORS
 	        .cors(cors -> cors.configurationSource(corsConfigurationSource))
 	    	.csrf(AbstractHttpConfigurer::disable)
