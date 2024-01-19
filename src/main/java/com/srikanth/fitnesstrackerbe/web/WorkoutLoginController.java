@@ -158,7 +158,7 @@ public class WorkoutLoginController {
 
 				// Make data into the updated DTO and return it:
 				TodaysWorkoutDTO updatedExerciseDTO = todaysWorkoutTableService
-						.processTodaysWorkoutUpdateData(workoutData, userId);
+						.processTodaysWorkoutUpdateData(workoutData, userId, exerciseId);
 				System.out.println("UPDATE DTO result is: " + updatedExerciseDTO);
 				return ResponseEntity.ok(updatedExerciseDTO);
 
