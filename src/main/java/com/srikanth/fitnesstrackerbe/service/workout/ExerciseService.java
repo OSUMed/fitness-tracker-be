@@ -42,10 +42,9 @@ public class ExerciseService {
 	public ExerciseDTO convertDataToExerciseDTO(Map<String, Object> fullExerciseData) {
 		Integer userId = (Integer) fullExerciseData.get("userId");
 		User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-	    
-		Instant instant = Instant.parse((String) fullExerciseData.get("date"));
-	    LocalDate date = instant.atZone(ZoneId.systemDefault()).toLocalDate();
 
+		Instant instant = Instant.parse((String) fullExerciseData.get("date"));
+		LocalDate date = instant.atZone(ZoneId.systemDefault()).toLocalDate();
 
 		System.out.println("processWorkoutData: Received workout data: " + fullExerciseData);
 
@@ -131,12 +130,14 @@ public class ExerciseService {
 		}
 
 		exercise.setUser(user.get());
+//		exercise.setId(exerciseDTO.getId());
 		exercise.setType(exerciseDTO.getType());
 		exercise.setExerciseName(exerciseDTO.getExerciseName());
 
+		System.out.println("convertExerciseDTOToExercise initial-- " + exercise);
 		List<ExerciseSet> exerciseSets = convertSetDTOsToExerciseSets(exerciseDTO.getSets(), exercise);
 		exercise.setSets(exerciseSets);
-
+		System.out.println("convertExerciseDTOToExercise final-- " + exercise);
 		return exercise;
 	}
 
@@ -147,6 +148,7 @@ public class ExerciseService {
 			if (setDTO instanceof CardioSetDTO) {
 				CardioSet cardioSet = new CardioSet();
 				cardioSet.setExercise(exercise);
+//				cardioSet.setId(setDTO.getId());
 				cardioSet.setDistance(((CardioSetDTO) setDTO).getDistance());
 				exerciseSet = cardioSet;
 			} else if (setDTO instanceof StrengthSetDTO) {
@@ -154,11 +156,13 @@ public class ExerciseService {
 				strengthSet.setExercise(exercise);
 				strengthSet.setReps(((StrengthSetDTO) setDTO).getReps());
 				strengthSet.setWeight(((StrengthSetDTO) setDTO).getWeight());
+//				strengthSet.setId(setDTO.getId());
 				exerciseSet = strengthSet;
 			} else if (setDTO instanceof StretchSetDTO) {
 				StretchSet stretchSet = new StretchSet();
 				stretchSet.setExercise(exercise);
 				stretchSet.setSeconds(((StretchSetDTO) setDTO).getSeconds());
+//				stretchSet.setId(setDTO.getId());
 				exerciseSet = stretchSet;
 			}
 			if (exerciseSet != null) {
@@ -166,75 +170,79 @@ public class ExerciseService {
 				exerciseSets.add(exerciseSet);
 			}
 		}
+		System.out.println("convertSetDTOsToExerciseSets final is: " + exerciseSets);
 		return exerciseSets;
 	}
 
 	public TodaysWorkoutDTO convertDomainToDTO(TodaysWorkout todaysWorkout) {
 		TodaysWorkoutDTO todaysWorkoutDTO = new TodaysWorkoutDTO();
 		todaysWorkoutDTO.setUserId(todaysWorkout.getUserId());
-		
-	    // Convert java.util.Date to java.sql.Date
-	    java.util.Date utilDate = todaysWorkout.getDate();
-	    if (utilDate != null) {
-	        java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
-	        todaysWorkoutDTO.setDate(sqlDate);
-	    }
+
+		// Convert java.util.Date to java.sql.Date
+		java.util.Date utilDate = todaysWorkout.getDate();
+		if (utilDate != null) {
+			java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+			todaysWorkoutDTO.setDate(sqlDate);
+		}
 
 		List<ExerciseDTO> exerciseDTOs = todaysWorkout.getExercises().stream().map(this::convertExerciseToDTO)
 				.collect(Collectors.toList());
-
+		System.out.println(
+				"convertDomainToDTO exerciseDTOs -> todaysWorkoutDTO.setExercises(exerciseDTOs): " + exerciseDTOs);
 		todaysWorkoutDTO.setExercises(exerciseDTOs);
 
 		return todaysWorkoutDTO;
 	}
 
 	private ExerciseDTO convertExerciseToDTO(Exercise exercise) {
-	    ExerciseDTO exerciseDTO = null;
-
-	    if (exercise instanceof CardioExercise) {
-	        List<CardioSetDTO> cardioSetDTOs = ((CardioExercise) exercise).getSets().stream()
-	                .map(set -> (CardioSetDTO) convertSetToDTO(set)) 
-	                .collect(Collectors.toList());
-	        exerciseDTO = ExerciseDTO.createCardioExerciseDTO(exercise.getId(), exercise.getExerciseName(),
-	                cardioSetDTOs, exercise.getUser().getId(), null);
-	    } else if (exercise instanceof StrengthExercise) {
-	        List<StrengthSetDTO> strengthSetDTOs = ((StrengthExercise) exercise).getSets().stream()
-	                .map(set -> (StrengthSetDTO) convertSetToDTO(set)) 
-	                .collect(Collectors.toList());
-	        exerciseDTO = ExerciseDTO.createStrengthExerciseDTO(exercise.getId(), exercise.getExerciseName(),
-	                strengthSetDTOs, exercise.getUser().getId(), null);
-	    } else if (exercise instanceof StretchExercise) {
-	        List<StretchSetDTO> stretchSetDTOs = ((StretchExercise) exercise).getSets().stream()
-	                .map(set -> (StretchSetDTO) convertSetToDTO(set)) 
-	                .collect(Collectors.toList());
-	        exerciseDTO = ExerciseDTO.createStretchExerciseDTO(exercise.getId(), exercise.getExerciseName(),
-	                stretchSetDTOs, exercise.getUser().getId(), null);
-	    }
-	    return exerciseDTO;
+		ExerciseDTO exerciseDTO = null;
+		if (exercise instanceof CardioExercise) {
+			List<CardioSetDTO> cardioSetDTOs = ((CardioExercise) exercise).getSets().stream()
+					.map(set -> (CardioSetDTO) convertSetToDTO(set)).collect(Collectors.toList());
+			exerciseDTO = ExerciseDTO.createCardioExerciseDTO(exercise.getId(), exercise.getExerciseName(),
+					cardioSetDTOs, exercise.getUser().getId(), null);
+		} else if (exercise instanceof StrengthExercise) {
+			List<StrengthSetDTO> strengthSetDTOs = ((StrengthExercise) exercise).getSets().stream()
+					.map(set -> (StrengthSetDTO) convertSetToDTO(set)).collect(Collectors.toList());
+			exerciseDTO = ExerciseDTO.createStrengthExerciseDTO(exercise.getId(), exercise.getExerciseName(),
+					strengthSetDTOs, exercise.getUser().getId(), null);
+		} else if (exercise instanceof StretchExercise) {
+			List<StretchSetDTO> stretchSetDTOs = ((StretchExercise) exercise).getSets().stream()
+					.map(set -> (StretchSetDTO) convertSetToDTO(set)).collect(Collectors.toList());
+			exerciseDTO = ExerciseDTO.createStretchExerciseDTO(exercise.getId(), exercise.getExerciseName(),
+					stretchSetDTOs, exercise.getUser().getId(), null);
+		}
+		return exerciseDTO;
 	}
-
 
 	private ExerciseSetDTO convertSetToDTO(ExerciseSet set) {
-	    if (set instanceof CardioSet) {
-	        CardioSet cardioSet = (CardioSet) set;
-	        CardioSetDTO cardioSetDTO = new CardioSetDTO();
-	        cardioSetDTO.setDistance(cardioSet.getDistance());
-	        return cardioSetDTO;
-	    } else if (set instanceof StrengthSet) {
-	        StrengthSet strengthSet = (StrengthSet) set;
-	        StrengthSetDTO strengthSetDTO = new StrengthSetDTO();
-	        strengthSetDTO.setReps(strengthSet.getReps());
-	        strengthSetDTO.setWeight(strengthSet.getWeight());
-	        return strengthSetDTO;
-	    } else if (set instanceof StretchSet) {
-	        StretchSet stretchSet = (StretchSet) set;
-	        StretchSetDTO stretchSetDTO = new StretchSetDTO();
-	        stretchSetDTO.setSeconds(stretchSet.getSeconds());
-	        return stretchSetDTO;
-	    } else {
-	        throw new IllegalArgumentException("Unknown set type: " + set.getClass().getSimpleName());
-	    }
+		if (set instanceof CardioSet) {
+			CardioSet cardioSet = (CardioSet) set;
+			CardioSetDTO cardioSetDTO = new CardioSetDTO();
+			System.out.println("convertSetToDTO: initial cardioSet is: " + cardioSet);
+			System.out.println("convertSetToDTO: initial cardioSetDTO is: " + cardioSetDTO);
+			cardioSetDTO.setDistance(cardioSet.getDistance());
+//			cardioSetDTO.setId(cardioSet.getId());
+			System.out.println("convertSetToDTO: final product is: " + cardioSetDTO);
+			return cardioSetDTO;
+		} else if (set instanceof StrengthSet) {
+			StrengthSet strengthSet = (StrengthSet) set;
+			StrengthSetDTO strengthSetDTO = new StrengthSetDTO();
+			strengthSetDTO.setReps(strengthSet.getReps());
+			strengthSetDTO.setWeight(strengthSet.getWeight());
+//			strengthSetDTO.setId(strengthSet.getId());
+			System.out.println("convertSetToDTO: final product is: " + strengthSetDTO);
+			return strengthSetDTO;
+		} else if (set instanceof StretchSet) {
+			StretchSet stretchSet = (StretchSet) set;
+			StretchSetDTO stretchSetDTO = new StretchSetDTO();
+			stretchSetDTO.setSeconds(stretchSet.getSeconds());
+//			stretchSetDTO.setId(stretchSet.getId());
+			System.out.println("convertSetToDTO: final product is: " + stretchSetDTO);
+			return stretchSetDTO;
+		} else {
+			throw new IllegalArgumentException("Unknown set type: " + set.getClass().getSimpleName());
+		}
 	}
-
 
 }
