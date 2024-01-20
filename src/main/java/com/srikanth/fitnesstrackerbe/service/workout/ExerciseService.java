@@ -58,9 +58,17 @@ public class ExerciseService {
 
 		String type = (String) exerciseData.get("type");
 		String exerciseName = (String) exerciseData.get("exerciseName");
+		Integer idInteger = (Integer) exerciseData.get("exerciseId");
+		Long idLong = null;
+		
+		// Exercise Id is initially 0 for new exercise:
+		if (idInteger != null && idInteger != 0) {
+		    idLong = idInteger.longValue(); 
+		}
 		@SuppressWarnings("unchecked")
 		List<Map<String, Object>> setsData = (List<Map<String, Object>>) exerciseData.get("sets");
 		System.out.println("preExerciseDTO type & exercise name data: " + type + " & " + exerciseName);
+		System.out.println("preExerciseDTO idLong: " + idLong);
 		System.out.println("preExerciseDTO set data: " + setsData);
 
 		ExerciseDTO exerciseDTO = null;
@@ -79,7 +87,7 @@ public class ExerciseService {
 			}
 			System.out.println("Calling createCardioExerciseDTO...");
 			// Creates an ExerciseDTO with the list of set DTOs.
-			exerciseDTO = ExerciseDTO.createCardioExerciseDTO(null, exerciseName, cardioSets, userId, null);
+			exerciseDTO = ExerciseDTO.createCardioExerciseDTO(idLong, exerciseName, cardioSets, userId, null);
 			break;
 		case "Strength":
 			List<StrengthSetDTO> strengthSets = new ArrayList<>();
@@ -88,7 +96,7 @@ public class ExerciseService {
 				strengthSets.add(strengthSet);
 			}
 			System.out.println("Calling createStrengthExerciseDTO...");
-			exerciseDTO = ExerciseDTO.createStrengthExerciseDTO(null, exerciseName, strengthSets, userId, null);
+			exerciseDTO = ExerciseDTO.createStrengthExerciseDTO(idLong, exerciseName, strengthSets, userId, null);
 			break;
 		case "Stretch":
 			List<StretchSetDTO> stretchSets = new ArrayList<>();
@@ -97,7 +105,7 @@ public class ExerciseService {
 				stretchSets.add(stretchSet);
 			}
 			System.out.println("Calling createStretchExerciseDTO...");
-			exerciseDTO = ExerciseDTO.createStretchExerciseDTO(null, exerciseName, stretchSets, userId, null);
+			exerciseDTO = ExerciseDTO.createStretchExerciseDTO(idLong, exerciseName, stretchSets, userId, null);
 			break;
 		default:
 			System.out.println("Unknown set type in setsData: " + type);
@@ -130,7 +138,7 @@ public class ExerciseService {
 		}
 
 		exercise.setUser(user.get());
-//		exercise.setId(exerciseDTO.getId());
+		exercise.setId(exerciseDTO.getId());
 		exercise.setType(exerciseDTO.getType());
 		exercise.setExerciseName(exerciseDTO.getExerciseName());
 
@@ -148,6 +156,7 @@ public class ExerciseService {
 			if (setDTO instanceof CardioSetDTO) {
 				CardioSet cardioSet = new CardioSet();
 				cardioSet.setExercise(exercise);
+				// I am thinking that set is initially 0 so causing error. Make sure you do same conditional as you did for exercise name BREAK
 //				cardioSet.setId(setDTO.getId());
 				cardioSet.setDistance(((CardioSetDTO) setDTO).getDistance());
 				exerciseSet = cardioSet;
@@ -222,7 +231,7 @@ public class ExerciseService {
 			System.out.println("convertSetToDTO: initial cardioSet is: " + cardioSet);
 			System.out.println("convertSetToDTO: initial cardioSetDTO is: " + cardioSetDTO);
 			cardioSetDTO.setDistance(cardioSet.getDistance());
-//			cardioSetDTO.setId(cardioSet.getId());
+			cardioSetDTO.setId(cardioSet.getId());
 			System.out.println("convertSetToDTO: final product is: " + cardioSetDTO);
 			return cardioSetDTO;
 		} else if (set instanceof StrengthSet) {
@@ -230,14 +239,14 @@ public class ExerciseService {
 			StrengthSetDTO strengthSetDTO = new StrengthSetDTO();
 			strengthSetDTO.setReps(strengthSet.getReps());
 			strengthSetDTO.setWeight(strengthSet.getWeight());
-//			strengthSetDTO.setId(strengthSet.getId());
+			strengthSetDTO.setId(strengthSet.getId());
 			System.out.println("convertSetToDTO: final product is: " + strengthSetDTO);
 			return strengthSetDTO;
 		} else if (set instanceof StretchSet) {
 			StretchSet stretchSet = (StretchSet) set;
 			StretchSetDTO stretchSetDTO = new StretchSetDTO();
 			stretchSetDTO.setSeconds(stretchSet.getSeconds());
-//			stretchSetDTO.setId(stretchSet.getId());
+			stretchSetDTO.setId(stretchSet.getId());
 			System.out.println("convertSetToDTO: final product is: " + stretchSetDTO);
 			return stretchSetDTO;
 		} else {

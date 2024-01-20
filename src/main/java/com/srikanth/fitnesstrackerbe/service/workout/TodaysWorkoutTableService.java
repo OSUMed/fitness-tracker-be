@@ -138,7 +138,7 @@ public class TodaysWorkoutTableService {
 		// Make Data to Exercise:
 		ExerciseDTO exerciseDTO = exerciseService.convertDataToExerciseDTO(fullExerciseData);
 		System.out.println(
-				"UPDATE final exerciseDTO: " + exerciseDTO + " exerciseDTO's userId: " + exerciseDTO.getUserId());
+				"processTodaysWorkoutUpdateData final exerciseDTO: " + exerciseDTO + " exerciseDTO's userId: " + exerciseDTO.getUserId());
 		Exercise exerciseWithNewData = exerciseService.convertExerciseDTOToExercise(exerciseDTO);
 		System.out.println("UPDATE exercise domain: " + exerciseWithNewData);
 
