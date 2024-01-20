@@ -159,7 +159,7 @@ public class TodaysWorkoutTableService {
 //		todaysWorkout.getExercises().add(exercise);
 		// Update data:
 		TodaysWorkout updatedTodaysWorkout = updateExerciseInTodaysWorkout(exerciseWithNewData, todaysWorkout, exerciseId);
-		System.out.println("processTodaysWorkoutUpdateData: Item being saved to repo is: " + updatedTodaysWorkout);
+		System.out.println("processTodaysWorkoutUpdateData: domain->repo: " + updatedTodaysWorkout);
 		TodaysWorkout savedTodaysWorkout = todaysWorkoutRepository.save(updatedTodaysWorkout);
 		// Convert to DTO and return
 		return returnTodaysWorkoutData(savedTodaysWorkout);
