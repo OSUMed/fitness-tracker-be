@@ -88,7 +88,7 @@ public class TodaysWorkoutTableService {
 			todaysWorkoutDTO = exerciseService.convertDomainToDTO(databaseTodaysWorkout.get());
 		}
 
-		System.out.println("Finished TodaysWorkoutDTO: " + databaseTodaysWorkout);
+		System.out.println("Finished TodaysWorkoutDTO: " + todaysWorkoutDTO);
 		// Return DTO
 		return todaysWorkoutDTO;
 	}
@@ -144,25 +144,26 @@ public class TodaysWorkoutTableService {
 
 		java.util.Date todayDate = new java.util.Date();
 		java.sql.Date sqlDate = new java.sql.Date(todayDate.getTime());
+		return new TodaysWorkoutDTO();
 
-		// Get Saved Exercise data to update:
-		System.out.println("User Id is: " + userId);
-		Optional<TodaysWorkout> existingWorkout = todaysWorkoutRepository.findByUserIdAndDate(userId, sqlDate);
-		TodaysWorkout todaysWorkout = null;
-		if (existingWorkout.isPresent()) {
-			todaysWorkout = existingWorkout.get();
-		}
-		System.out.println("Returned Repo with userId Id is: " + userId + todaysWorkout);
-
-		// Add the exercise to today's workout
-//		exercise.setWorkout(todaysWorkout);
-//		todaysWorkout.getExercises().add(exercise);
-		// Update data:
-		TodaysWorkout updatedTodaysWorkout = updateExerciseInTodaysWorkout(exerciseWithNewData, todaysWorkout, exerciseId);
-		System.out.println("processTodaysWorkoutUpdateData: domain->repo: " + updatedTodaysWorkout);
-		TodaysWorkout savedTodaysWorkout = todaysWorkoutRepository.save(updatedTodaysWorkout);
-		// Convert to DTO and return
-		return returnTodaysWorkoutData(savedTodaysWorkout);
+//		// Get Saved Exercise data to update:
+//		System.out.println("User Id is: " + userId);
+//		Optional<TodaysWorkout> existingWorkout = todaysWorkoutRepository.findByUserIdAndDate(userId, sqlDate);
+//		TodaysWorkout todaysWorkout = null;
+//		if (existingWorkout.isPresent()) {
+//			todaysWorkout = existingWorkout.get();
+//		}
+//		System.out.println("Returned Repo with userId Id is: " + userId + todaysWorkout);
+//
+//		// Add the exercise to today's workout
+////		exercise.setWorkout(todaysWorkout);
+////		todaysWorkout.getExercises().add(exercise);
+//		// Update data:
+//		TodaysWorkout updatedTodaysWorkout = updateExerciseInTodaysWorkout(exerciseWithNewData, todaysWorkout, exerciseId);
+//		System.out.println("processTodaysWorkoutUpdateData: domain->repo: " + updatedTodaysWorkout);
+//		TodaysWorkout savedTodaysWorkout = todaysWorkoutRepository.save(updatedTodaysWorkout);
+//		// Convert to DTO and return
+//		return returnTodaysWorkoutData(savedTodaysWorkout);
 	}
 
 	private TodaysWorkout updateExerciseInTodaysWorkout(Exercise exerciseWithNewData, TodaysWorkout todaysWorkout, Integer exerciseId) {
