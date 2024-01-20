@@ -88,7 +88,7 @@ public class WorkoutLoginController {
 			}
 		} else {
 			System.out.println("REJECTED @GetMapping(workoutlogins): ");
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 		}
 	}
 
@@ -141,7 +141,7 @@ public class WorkoutLoginController {
 			}
 		} else {
 			System.out.println("Authentication failed for delete request.");
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // Not authenticated or authorized
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); // Not authenticated or authorized
 		}
 	}
 
@@ -151,6 +151,11 @@ public class WorkoutLoginController {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
 		if (authentication != null && authentication.isAuthenticated()) {
+			System.out.println("------------in @PutMapping(workoutlogins)------------");
+			System.out.println("workoutData: " + workoutData);
+			System.out.println("exerciseId): " + exerciseId);
+			System.out.println("----------------------------");
+//			return ResponseEntity.ok(new TodaysWorkoutDTO());
 			try {
 				String userName = authentication.getName();
 				User loggedInUser = (User) userService.loadUserByUsername(userName);
@@ -168,7 +173,7 @@ public class WorkoutLoginController {
 			}
 		} else {
 			System.out.println("Authentication failed for delete request.");
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // Not authenticated or authorized
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); 
 		}
 
 	}
