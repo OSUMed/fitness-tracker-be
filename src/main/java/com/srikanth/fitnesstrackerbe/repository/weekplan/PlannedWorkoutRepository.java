@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 import com.srikanth.fitnesstrackerbe.domain.weekplan.PlannedWorkout;
 
 @Repository
-public interface PlannedWorkoutRepository extends JpaRepository<PlannedWorkout, String> {
+public interface PlannedWorkoutRepository extends JpaRepository<PlannedWorkout, Long> {
 }
