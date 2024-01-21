@@ -1,5 +1,7 @@
 package com.srikanth.fitnesstrackerbe.domain.weekplan;
 
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Entity;
@@ -8,38 +10,45 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 public class PlannedWorkout {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private String id;
+	private Long id;
 
 	private String type;
 
-	@ManyToOne
-	@JoinColumn(name = "day_plan_id")
-	private DayPlan dayPlan;
+    @ManyToOne
+    @JoinColumn(name = "day_plan_id")
+    @JsonBackReference // Prevents infinite recursion
+    private DayPlan dayPlan;
 
-	@ElementCollection
-	private List<Exercise> exercises;
+    @ElementCollection
+    @CollectionTable(name = "planned_workout_exercises", joinColumns = @JoinColumn(name = "planned_workout_id"))
+    @Column(name = "exercise")
+	private List<WorkoutExercise> workoutExercises;
 
 	public PlannedWorkout() {
 	}
 
-	public PlannedWorkout(String id, String type, DayPlan dayPlan, List<Exercise> exercises) {
+	public PlannedWorkout(Long id, String type, DayPlan dayPlan, List<WorkoutExercise> workoutExercises) {
 		this.id = id;
 		this.type = type;
 		this.dayPlan = dayPlan;
-		this.exercises = exercises;
+		this.workoutExercises = workoutExercises;
 	}
 
-	public String getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -59,28 +68,28 @@ public class PlannedWorkout {
 		this.dayPlan = dayPlan;
 	}
 
-	public List<Exercise> getExercises() {
-		return exercises;
+	public List<WorkoutExercise> getExercises() {
+		return workoutExercises;
 	}
 
-	public void setExercises(List<Exercise> exercises) {
-		this.exercises = exercises;
+	public void setExercises(List<WorkoutExercise> workoutExercises) {
+		this.workoutExercises = workoutExercises;
 	}
 
 	@Override
 	public String toString() {
 		return "PlannedWorkout{" + "id='" + id + '\'' + ", type='" + type + '\'' + ", dayPlan="
-				+ (dayPlan != null ? dayPlan.getId() : "null") + ", exercises=" + exercises + '}';
+				+ (dayPlan != null ? dayPlan.getId() : "null") + ", exercises=" + workoutExercises + '}';
 	}
 
 	@Embeddable
-	public static class Exercise {
+	public static class WorkoutExercise {
 		private String name;
 
-		public Exercise() {
+		public WorkoutExercise() {
 		}
 
-		public Exercise(String name) {
+		public WorkoutExercise(String name) {
 			this.name = name;
 		}
 

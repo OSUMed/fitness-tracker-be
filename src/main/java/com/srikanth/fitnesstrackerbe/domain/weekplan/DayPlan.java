@@ -1,7 +1,12 @@
 package com.srikanth.fitnesstrackerbe.domain.weekplan;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -9,8 +14,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "DAY_PLAN")
 public class DayPlan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,14 +25,17 @@ public class DayPlan {
 
     @ManyToOne
     @JoinColumn(name = "weekly_plan_id")
+    @JsonBackReference // Prevents infinite recursion
     private WeeklyPlan weeklyPlan;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dayPlan")
+    @JsonManagedReference // Manages serialization
+    private List<PlannedWorkout> workouts;
+    
+    @Column(name = "\"day\"") 
     private String day;
     private String duration;
     private String intensity;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dayPlan")
-    private List<PlannedWorkout> workouts;
 
     public DayPlan() {
     	
@@ -92,9 +102,11 @@ public class DayPlan {
 
 	@Override
 	public String toString() {
-		return "DayPlan [id=" + id + ", weeklyPlan=" + weeklyPlan + ", day=" + day + ", duration=" + duration
-				+ ", intensity=" + intensity + ", workouts=" + workouts + "]";
+	    return "DayPlan [id=" + id + ", weeklyPlanId=" + (weeklyPlan != null ? weeklyPlan.getId() : "null") 
+	        + ", day=" + day + ", duration=" + duration + ", intensity=" + intensity 
+	        + ", workouts=" + workouts.stream().map(PlannedWorkout::getId).collect(Collectors.toList()) + "]";
 	}
+
     
 
 }

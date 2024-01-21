@@ -8,6 +8,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 public class WeeklyPlan {
@@ -16,7 +20,8 @@ public class WeeklyPlan {
     private Long id;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "weeklyPlan")
-    private List<DayPlan> dayPlans;
+    @JsonManagedReference // Manages serialization
+    private List<DayPlan> dayPlans = new ArrayList<>();
 
     public WeeklyPlan() {
     }
@@ -42,12 +47,9 @@ public class WeeklyPlan {
         this.dayPlans = dayPlans;
     }
 
-    // toString
     @Override
     public String toString() {
-        return "WeeklyPlan{" +
-                "id=" + id +
-                ", dayPlans=" + dayPlans +
-                '}';
+        return "WeeklyPlan{" + "id=" + id + ", dayPlanIds=" + dayPlans.stream().map(DayPlan::getId).collect(Collectors.toList()) + '}';
     }
+
 }
