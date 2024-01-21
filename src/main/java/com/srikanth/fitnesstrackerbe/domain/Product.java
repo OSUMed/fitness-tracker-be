@@ -22,6 +22,9 @@ public class Product {
     private String name;
     private BigDecimal price;
     
+    public Product() {
+    	
+    }
     public Product(Integer id, String name, BigDecimal price) {
         super();
         this.id = id;
