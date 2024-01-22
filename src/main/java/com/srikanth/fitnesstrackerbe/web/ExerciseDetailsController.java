@@ -59,10 +59,10 @@ public class ExerciseDetailsController {
 	}
 
 	@PostMapping("/")
-	public ResponseEntity<List<ExerciseDetails>> createExerciseDetails(@RequestBody List<ExerciseDetails> dayPlans) {
+	public ResponseEntity<List<ExerciseDetails>> createExerciseDetails(@RequestBody ExerciseDetails exerciseDetail) {
 		try {
-			System.out.println("createExerciseDetails: " + dayPlans);
-			ExerciseDetails savedExerciseDetail = exerciseDetailsService.postExerciseDetail(dayPlans);
+			System.out.println("createExerciseDetails: " + exerciseDetail);
+			ExerciseDetails savedExerciseDetail = exerciseDetailsService.postExerciseDetail(exerciseDetail);
 			System.out.println("createExerciseDetails weeklyPlan: " + savedExerciseDetail);
 			return ResponseEntity.ok(exerciseDetailsService.returnAllDetails());
 		} catch (Exception e) {
