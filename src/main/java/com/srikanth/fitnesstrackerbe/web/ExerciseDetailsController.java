@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.srikanth.fitnesstrackerbe.domain.details.ExerciseDetails;
 import com.srikanth.fitnesstrackerbe.service.details.ExerciseDetailsService;
 
@@ -59,11 +59,16 @@ public class ExerciseDetailsController {
 	}
 
 	@PostMapping("/")
-	public ResponseEntity<List<ExerciseDetails>> createExerciseDetails(@RequestBody ExerciseDetails exerciseDetail) {
+	public ResponseEntity<List<ExerciseDetails>> createExerciseDetails(@RequestBody String exerciseDetailJson) {
 		try {
-			System.out.println("createExerciseDetails: " + exerciseDetail);
-			ExerciseDetails savedExerciseDetail = exerciseDetailsService.postExerciseDetail(exerciseDetail);
-			System.out.println("createExerciseDetails weeklyPlan: " + savedExerciseDetail);
+	       // Deserialize the JSON string into ExerciseDetails
+			System.out.println("pre jackson ExerciseDetails: " + exerciseDetailJson);
+	        ObjectMapper objectMapper = new ObjectMapper();
+	        ExerciseDetails exerciseDetail = objectMapper.readValue(exerciseDetailJson, ExerciseDetails.class);
+
+	        System.out.println("post jackson ExerciseDetails: " + exerciseDetail);
+//			ExerciseDetails savedExerciseDetail = exerciseDetailsService.postExerciseDetail(exerciseDetail);
+//			System.out.println("createExerciseDetails weeklyPlan: " + savedExerciseDetail);
 			return ResponseEntity.ok(exerciseDetailsService.returnAllDetails());
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
