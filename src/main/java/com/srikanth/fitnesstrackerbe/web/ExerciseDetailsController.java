@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -75,9 +76,8 @@ public class ExerciseDetailsController {
 		}
 	}
 
-	@PutMapping("/")
-	public ResponseEntity<List<ExerciseDetails>> putExerciseDetails(@RequestBody ExerciseDetails exerciseDetail,
-			String id) {
+	@PutMapping("/{exerciseDetailId}")
+	public ResponseEntity<List<ExerciseDetails>> putExerciseDetails(@PathVariable Long exerciseDetailId, @RequestBody ExerciseDetails exerciseDetail) {
 		try {
 			System.out.println("putExerciseDetails: " + exerciseDetail);
 			ExerciseDetails savedExerciseDetail = exerciseDetailsService.putExerciseDetail(exerciseDetail);
@@ -88,12 +88,12 @@ public class ExerciseDetailsController {
 		}
 	}
 
-	@DeleteMapping("/")
-	public ResponseEntity<Void> deleteExerciseDetails(String exerciseDetailId) {
+	@DeleteMapping("/{exerciseDetailId}")
+	public ResponseEntity<List<ExerciseDetails>> deleteExerciseDetails(@PathVariable Long exerciseDetailId) {
 		try {
 			System.out.println("deleteExerciseDetails: ");
 			exerciseDetailsService.deleteExerciseDetail(exerciseDetailId);
-			return ResponseEntity.ok().build();
+			return ResponseEntity.ok(exerciseDetailsService.returnAllDetails());
 
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
