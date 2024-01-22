@@ -34,7 +34,7 @@ public class ExerciseDetail {
 	private Integer userId;
 
     // One-to-Many relationship with Exercise
-    @OneToMany(mappedBy = "exerciseDetail", cascade = CascadeType.ALL, orphanRemoval = true)
+//    @OneToMany(mappedBy = "exerciseDetail", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Exercise> exercises;
 
     // Constructors
@@ -149,7 +149,6 @@ public class ExerciseDetail {
 		this.exercises = exercises;
 	}
 
-	// toString method
     @Override
     public String toString() {
         return "ExerciseDetail{" +

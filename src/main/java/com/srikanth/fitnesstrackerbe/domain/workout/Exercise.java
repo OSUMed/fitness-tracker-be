@@ -35,8 +35,8 @@ public class Exercise {
 	@JoinColumn(name = "user_id")
 	private User user;
 
-	@ManyToOne
-	@JoinColumn(name = "exercise_detail_id")
+//	@ManyToOne
+//	@JoinColumn(name = "exercise_detail_id")
 	private ExerciseDetail exerciseDetail;
 
 	@ManyToOne
