@@ -53,6 +53,7 @@ public class SecurityConfiguration {
 					authz.requestMatchers(new AntPathRequestMatcher("/user/welcome")).authenticated()
 							.requestMatchers(new AntPathRequestMatcher("/workouts/**")).authenticated()
 							.requestMatchers(new AntPathRequestMatcher("/weekplan/**")).authenticated()
+							.requestMatchers(new AntPathRequestMatcher("/details/**")).authenticated()
 							.requestMatchers(new AntPathRequestMatcher("/admin/**")).hasAuthority("ROLE_ADMIN")
 							.requestMatchers(new AntPathRequestMatcher("/user/**")).hasAuthority("ROLE_USER")
 							.anyRequest().authenticated();
