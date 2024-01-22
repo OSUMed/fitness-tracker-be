@@ -3,6 +3,7 @@ package com.srikanth.fitnesstrackerbe.web;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -36,38 +37,61 @@ public class ExerciseDetailsController {
 
 	@GetMapping("/findAll")
 	public ResponseEntity<List<ExerciseDetails>> getExerciseDetails() {
-		System.out.println("getExerciseDetails: ");
-		return ResponseEntity.ok(exerciseDetailsService.returnAllDetails());
+		try {
+
+			System.out.println("getExerciseDetails: ");
+			return ResponseEntity.ok(exerciseDetailsService.returnAllDetails());
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
 	}
 
 	@GetMapping("/filter")
 	public ResponseEntity<List<ExerciseDetails>> getFilteredExerciseDetails(String exerciseDetailsType) {
-		System.out.println("getFilteredExerciseDetails: " + exerciseDetailsType);
-		List<ExerciseDetails> filteredExerciseDetail = exerciseDetailsService.filterExerciseDetail(exerciseDetailsType);
-		return ResponseEntity.ok(filteredExerciseDetail);
+		try {
+			System.out.println("getFilteredExerciseDetails: " + exerciseDetailsType);
+			List<ExerciseDetails> filteredExerciseDetail = exerciseDetailsService
+					.filterExerciseDetail(exerciseDetailsType);
+			return ResponseEntity.ok(filteredExerciseDetail);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
 	}
 
 	@PostMapping("/")
 	public ResponseEntity<List<ExerciseDetails>> createExerciseDetails(@RequestBody List<ExerciseDetails> dayPlans) {
-		System.out.println("createExerciseDetails: " + dayPlans);
-		ExerciseDetails savedExerciseDetail = exerciseDetailsService.postExerciseDetail(dayPlans);
-		System.out.println("createExerciseDetails weeklyPlan: " + savedExerciseDetail);
-		return ResponseEntity.ok(exerciseDetailsService.returnAllDetails());
+		try {
+			System.out.println("createExerciseDetails: " + dayPlans);
+			ExerciseDetails savedExerciseDetail = exerciseDetailsService.postExerciseDetail(dayPlans);
+			System.out.println("createExerciseDetails weeklyPlan: " + savedExerciseDetail);
+			return ResponseEntity.ok(exerciseDetailsService.returnAllDetails());
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
 	}
 
 	@PutMapping("/")
 	public ResponseEntity<List<ExerciseDetails>> putExerciseDetails(@RequestBody ExerciseDetails exerciseDetail,
 			String id) {
-		System.out.println("putExerciseDetails: " + exerciseDetail);
-		ExerciseDetails savedExerciseDetail = exerciseDetailsService.putExerciseDetail(exerciseDetail);
-		System.out.println("createExerciseDetails weeklyPlan: " + savedExerciseDetail);
-		return ResponseEntity.ok(exerciseDetailsService.returnAllDetails());
+		try {
+			System.out.println("putExerciseDetails: " + exerciseDetail);
+			ExerciseDetails savedExerciseDetail = exerciseDetailsService.putExerciseDetail(exerciseDetail);
+			System.out.println("createExerciseDetails weeklyPlan: " + savedExerciseDetail);
+			return ResponseEntity.ok(exerciseDetailsService.returnAllDetails());
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
 	}
 
 	@DeleteMapping("/")
 	public ResponseEntity<Void> deleteExerciseDetails(String exerciseDetailId) {
-		System.out.println("deleteExerciseDetails: ");
-		exerciseDetailsService.deleteExerciseDetail(exerciseDetailId);
-		return ResponseEntity.ok().build();
+		try {
+			System.out.println("deleteExerciseDetails: ");
+			exerciseDetailsService.deleteExerciseDetail(exerciseDetailId);
+			return ResponseEntity.ok().build();
+
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
 	}
 }
