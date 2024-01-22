@@ -87,7 +87,7 @@ public class ExerciseService {
 			}
 			System.out.println("Calling createCardioExerciseDTO...");
 			// Creates an ExerciseDTO with the list of set DTOs.
-			exerciseDTO = ExerciseDTO.createCardioExerciseDTO(idLong, exerciseName, cardioSets, userId, null);
+			exerciseDTO = ExerciseDTO.createCardioExerciseDTO(idLong, exerciseName, cardioSets, userId);
 			break;
 		case "Strength":
 			List<StrengthSetDTO> strengthSets = new ArrayList<>();
@@ -96,7 +96,7 @@ public class ExerciseService {
 				strengthSets.add(strengthSet);
 			}
 			System.out.println("Calling createStrengthExerciseDTO...");
-			exerciseDTO = ExerciseDTO.createStrengthExerciseDTO(idLong, exerciseName, strengthSets, userId, null);
+			exerciseDTO = ExerciseDTO.createStrengthExerciseDTO(idLong, exerciseName, strengthSets, userId);
 			break;
 		case "Stretch":
 			List<StretchSetDTO> stretchSets = new ArrayList<>();
@@ -105,7 +105,7 @@ public class ExerciseService {
 				stretchSets.add(stretchSet);
 			}
 			System.out.println("Calling createStretchExerciseDTO...");
-			exerciseDTO = ExerciseDTO.createStretchExerciseDTO(idLong, exerciseName, stretchSets, userId, null);
+			exerciseDTO = ExerciseDTO.createStretchExerciseDTO(idLong, exerciseName, stretchSets, userId);
 			break;
 		default:
 			System.out.println("Unknown set type in setsData: " + type);
@@ -228,17 +228,17 @@ public class ExerciseService {
 			List<CardioSetDTO> cardioSetDTOs = ((CardioExercise) exercise).getSets().stream()
 					.map(set -> (CardioSetDTO) convertExerciseSetToExerciseSetDTO(set)).collect(Collectors.toList());
 			exerciseDTO = ExerciseDTO.createCardioExerciseDTO(exercise.getId(), exercise.getExerciseName(),
-					cardioSetDTOs, exercise.getUser().getId(), null);
+					cardioSetDTOs, exercise.getUser().getId());
 		} else if (exercise instanceof StrengthExercise) {
 			List<StrengthSetDTO> strengthSetDTOs = ((StrengthExercise) exercise).getSets().stream()
 					.map(set -> (StrengthSetDTO) convertExerciseSetToExerciseSetDTO(set)).collect(Collectors.toList());
 			exerciseDTO = ExerciseDTO.createStrengthExerciseDTO(exercise.getId(), exercise.getExerciseName(),
-					strengthSetDTOs, exercise.getUser().getId(), null);
+					strengthSetDTOs, exercise.getUser().getId());
 		} else if (exercise instanceof StretchExercise) {
 			List<StretchSetDTO> stretchSetDTOs = ((StretchExercise) exercise).getSets().stream()
 					.map(set -> (StretchSetDTO) convertExerciseSetToExerciseSetDTO(set)).collect(Collectors.toList());
 			exerciseDTO = ExerciseDTO.createStretchExerciseDTO(exercise.getId(), exercise.getExerciseName(),
-					stretchSetDTOs, exercise.getUser().getId(), null);
+					stretchSetDTOs, exercise.getUser().getId());
 		}
 		return exerciseDTO;
 	}

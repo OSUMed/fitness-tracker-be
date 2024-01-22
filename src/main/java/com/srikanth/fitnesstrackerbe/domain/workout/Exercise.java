@@ -37,21 +37,13 @@ public class Exercise {
 
 //	@ManyToOne
 //	@JoinColumn(name = "exercise_detail_id")
-	private ExerciseDetail exerciseDetail;
+//	private ExerciseDetail exerciseDetail;
 
 	@ManyToOne
 	@JoinColumn(name = "todays_workout_id")
 	private TodaysWorkout workout;
 
 	public Exercise() {
-	}
-
-	public ExerciseDetail getExerciseDetail() {
-		return exerciseDetail;
-	}
-
-	public void setExerciseDetail(ExerciseDetail exerciseDetail) {
-		this.exerciseDetail = exerciseDetail;
 	}
 
 	public User getUser() {
@@ -106,7 +98,7 @@ public class Exercise {
 	@Override
 	public String toString() {
 		return "Exercise [id=" + id + ", type=" + type + ", exerciseName=" + exerciseName + ", user=" + user
-				+ ", exerciseDetail=" + exerciseDetail + "]";
+				+ "]";
 	}
 
 }

@@ -184,7 +184,6 @@ public class TodaysWorkoutTableService {
 	    System.out.println("Exercise found in updateExerciseInTodaysWorkout: " + exerciseToUpdate);
 	    
 	    if (exerciseToUpdate != null) {
-	        exerciseToUpdate.setExerciseDetail(exerciseWithNewData.getExerciseDetail());
 	        exerciseToUpdate.setExerciseName(exerciseWithNewData.getExerciseName());
 	        exerciseToUpdate.setType(exerciseWithNewData.getType());
 //	        exerciseToUpdate.setSets(exerciseWithNewData.getSets());
