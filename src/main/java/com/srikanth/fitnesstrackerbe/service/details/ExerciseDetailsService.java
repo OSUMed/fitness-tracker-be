@@ -19,9 +19,12 @@ public class ExerciseDetailsService {
 		return exerciseDetailsRepository.findAll();
 	}
 
-	public ExerciseDetails postExerciseDetail(List<ExerciseDetails> exerciseDetail) {
-		// TODO Auto-generated method stub
-		return null;
+	public ExerciseDetails postExerciseDetail(ExerciseDetails exerciseDetail) {
+		try {
+			return exerciseDetailsRepository.save(exerciseDetail);
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to save exercise detail", e);
+		}
 	}
 
 	public ExerciseDetails putExerciseDetail(ExerciseDetails exerciseDetail) {
@@ -33,7 +36,7 @@ public class ExerciseDetailsService {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	public List<ExerciseDetails> filterExerciseDetail(String exerciseDetailsType) {
 		try {
 			return exerciseDetailsRepository.findByType(exerciseDetailsType);
