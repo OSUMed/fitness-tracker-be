@@ -19,7 +19,7 @@ public class WeeklyPlan {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "weeklyPlan")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "weeklyPlan", orphanRemoval = true)
     @JsonManagedReference // Manages serialization
     private List<DayPlan> dayPlans = new ArrayList<>();
 

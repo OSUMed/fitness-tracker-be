@@ -29,7 +29,7 @@ public class DayPlan {
     @JsonBackReference // Prevents infinite recursion
     private WeeklyPlan weeklyPlan;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dayPlan")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dayPlan", orphanRemoval = true)
     @JsonManagedReference // Manages serialization
     private List<PlannedWorkout> workouts = new ArrayList<>();
     

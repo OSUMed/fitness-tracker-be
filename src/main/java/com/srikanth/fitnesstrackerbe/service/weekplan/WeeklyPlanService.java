@@ -143,6 +143,7 @@ public class WeeklyPlanService {
 		}
 		WeeklyPlan thisWeekPlan = weeklyPlans.get(0);
 		weeklyPlanRepository.delete(thisWeekPlan);
+		return;
 
 	}
 
