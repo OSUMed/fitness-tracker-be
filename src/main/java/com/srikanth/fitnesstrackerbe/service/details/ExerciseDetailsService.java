@@ -32,9 +32,18 @@ public class ExerciseDetailsService {
 		return null;
 	}
 
-	public ExerciseDetails deleteExerciseDetail(String exerciseDetailId) {
-		// TODO Auto-generated method stub
-		return null;
+	public void deleteExerciseDetail(Long exerciseDetailId) {
+		try {
+			if (exerciseDetailsRepository.existsById(exerciseDetailId)) {
+				exerciseDetailsRepository.deleteById(exerciseDetailId);
+			} else {
+				throw new RuntimeException("Exercise detail not found with id: " + exerciseDetailId);
+			}
+		} catch (NumberFormatException e) {
+			throw new RuntimeException("Invalid exercise detail ID: " + exerciseDetailId, e);
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to delete exercise detail", e);
+		}
 	}
 
 	public List<ExerciseDetails> filterExerciseDetail(String exerciseDetailsType) {
