@@ -1,5 +1,6 @@
 package com.srikanth.fitnesstrackerbe.domain.weekplan;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -30,7 +31,7 @@ public class DayPlan {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dayPlan")
     @JsonManagedReference // Manages serialization
-    private List<PlannedWorkout> workouts;
+    private List<PlannedWorkout> workouts = new ArrayList<>();
     
     @Column(name = "\"day\"") 
     private String day;
