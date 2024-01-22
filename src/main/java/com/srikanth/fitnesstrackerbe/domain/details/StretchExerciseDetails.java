@@ -5,9 +5,11 @@ import jakarta.persistence.Entity;
 public class StretchExerciseDetails  extends ExerciseDetails {
     private int duration;
     private String difficulty;
-    
-	public StretchExerciseDetails(Long id, String type, String name, String infoLink, String notes, int duration, String difficulty) {
-		super(id, type, name, infoLink, notes);
+    public StretchExerciseDetails() {
+    	
+    }
+	public StretchExerciseDetails(String type, String name, String infoLink, String notes, int duration, String difficulty) {
+		super();
 		this.duration = duration;
 		this.difficulty = difficulty;
 	}

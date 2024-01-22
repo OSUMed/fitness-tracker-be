@@ -1,14 +1,21 @@
 package com.srikanth.fitnesstrackerbe.domain.details;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+//import javax.validation.constraints.Min;
+
 
 @Entity
 public class CardioExerciseDetails extends ExerciseDetails {
+//	@Min(0)
     private int duration;
+	@Column(nullable = true)
     private Integer distance; 
-    
-    public CardioExerciseDetails(Long id, String type, String name, String infoLink, String notes, int duration, Integer distance) {
-		super(id, type, name, infoLink, notes);
+    public CardioExerciseDetails() {
+    	
+    }
+    public CardioExerciseDetails(String type, String name, String infoLink, String notes, int duration, Integer distance) {
+		super(type, name, infoLink, notes);
 		this.duration = duration;
 		this.distance = distance;
 	}

@@ -5,8 +5,12 @@ import jakarta.persistence.Entity;
 @Entity
 public class StrengthExerciseDetails extends ExerciseDetails {
 	private String muscle;
-	public StrengthExerciseDetails(Long id, String type, String name, String infoLink, String notes, String muscle) {
-		super(id, type, name, infoLink, notes);
+	
+	public StrengthExerciseDetails() {
+		
+	}
+	public StrengthExerciseDetails(String type, String name, String infoLink, String notes, String muscle) {
+		super(type, name, infoLink, notes);
 		this.muscle = muscle;
 	}
 

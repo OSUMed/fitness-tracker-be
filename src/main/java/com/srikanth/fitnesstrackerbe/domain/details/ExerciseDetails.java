@@ -27,9 +27,7 @@ public abstract class ExerciseDetails {
     public ExerciseDetails() {
     	
     }
-	public ExerciseDetails(Long id, String type, String name, String infoLink, String notes) {
-		super();
-		this.id = id;
+	public ExerciseDetails(String type, String name, String infoLink, String notes) {
 		this.type = type;
 		this.name = name;
 		this.infoLink = infoLink;
