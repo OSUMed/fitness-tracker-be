@@ -1,5 +1,7 @@
 package com.srikanth.fitnesstrackerbe.web;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -11,12 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.srikanth.fitnesstrackerbe.dao.workout.TodaysWorkoutDTO;
 import com.srikanth.fitnesstrackerbe.domain.weekplan.DayPlan;
 import com.srikanth.fitnesstrackerbe.domain.weekplan.WeeklyPlan;
 import com.srikanth.fitnesstrackerbe.service.weekplan.WeeklyPlanService;
 
-import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -36,34 +36,31 @@ public class WeeklyPlanController {
 		return ResponseEntity.ok("Weekly Plan Test endpoint from eclipse!");
 	}
 	@GetMapping("/")
-	public ResponseEntity<WeeklyPlan> getWeeklyPlan() {
+	public ResponseEntity<List<DayPlan>> getWeeklyPlan() {
 		System.out.println("getWeeklyPlan: ");
 		return ResponseEntity.ok(weeklyPlanService.returnWeekPlan());
 	}
 
 	@PostMapping("/")
-	public ResponseEntity<WeeklyPlan> createWeeklyPlan(@RequestBody List<DayPlan> dayPlans) {
+	public ResponseEntity<List<DayPlan>> createWeeklyPlan(@RequestBody List<DayPlan> dayPlans) {
 		System.out.println("createWeeklyPlan: " + dayPlans);
-		WeeklyPlan weeklyPlan = weeklyPlanService.processIncomingDataToDomain(dayPlans);
-		System.out.println("createWeeklyPlan weeklyPlan: " + weeklyPlan);
-		WeeklyPlan savedWeekPlan = weeklyPlanService.saveWeeklyPlan(weeklyPlan);
+		WeeklyPlan savedWeekPlan = weeklyPlanService.processPostIncomingDataToDomainBackup(dayPlans);
 		System.out.println("createWeeklyPlan weeklyPlan: " + savedWeekPlan);
 		return ResponseEntity.ok(weeklyPlanService.returnWeekPlan());
 	}
 
+	@SuppressWarnings("unchecked")
 	@PutMapping("/")
-	public ResponseEntity<WeeklyPlan> putWeeklyPlan(@RequestBody List<DayPlan> dayPlans) {
+	public ResponseEntity<List<DayPlan>> putWeeklyPlan(@RequestBody List<DayPlan> dayPlans) {
 		System.out.println("putWeeklyPlan: " + dayPlans);
-		WeeklyPlan weeklyPlan = weeklyPlanService.processIncomingDataToDomain(dayPlans);
-		weeklyPlanService.updateWeeklyPlan(weeklyPlan);
+		weeklyPlanService.processUpdateIncomingDataToDomain(dayPlans);
 		return ResponseEntity.ok(weeklyPlanService.returnWeekPlan());
 	}
 
 	@DeleteMapping("/")
-	public ResponseEntity<WeeklyPlan> deleteWeeklyPlan() {
+	public ResponseEntity<List<DayPlan>> deleteWeeklyPlan() {
 		System.out.println("deleteWeeklyPlan: ");
-		WeeklyPlan thisWeekPlan = weeklyPlanService.deleteWeeklyPlan();
-		System.out.println("deleteWeeklyPlan returned week: " + thisWeekPlan);
-		return ResponseEntity.ok(thisWeekPlan);
+		weeklyPlanService.deleteWeeklyPlan();
+		return ResponseEntity.ok(new WeeklyPlan().getDayPlans());
 	}
 }
