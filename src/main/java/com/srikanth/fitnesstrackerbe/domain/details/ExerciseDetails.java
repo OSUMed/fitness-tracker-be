@@ -10,15 +10,23 @@ import jakarta.persistence.Inheritance;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
 
-
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = StrengthExerciseDetails.class, name = "strength"),
+    @JsonSubTypes.Type(value = CardioExerciseDetails.class, name = "cardio"),
+    @JsonSubTypes.Type(value = StretchExerciseDetails.class, name = "stretch")
+})
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class ExerciseDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @JsonProperty("type")
     private String type;
     private String name;
     private String infoLink;

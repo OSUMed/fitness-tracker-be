@@ -22,10 +22,13 @@ public class StrengthExerciseDetails extends ExerciseDetails {
 	public void setMuscle(String muscle) {
 		this.muscle = muscle;
 	}
-
 	@Override
 	public String toString() {
-		return "StrengthExerciseDetails [muscle=" + muscle + "]";
+		return "StrengthExerciseDetails [muscle=" + muscle + ", getId()=" + getId() + ", getType()=" + getType()
+				+ ", getName()=" + getName() + ", getInfoLink()=" + getInfoLink() + ", getNotes()=" + getNotes()
+				+ ", toString()=" + "]";
 	}
+
+	
 
 }

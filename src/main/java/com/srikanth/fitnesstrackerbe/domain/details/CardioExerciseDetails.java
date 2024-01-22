@@ -34,8 +34,11 @@ public class CardioExerciseDetails extends ExerciseDetails {
 	}
 	@Override
 	public String toString() {
-		return "CardioExerciseDetails [duration=" + duration + ", distance=" + distance + "]";
+		return "CardioExerciseDetails [duration=" + duration + ", distance=" + distance + ", getId()=" + getId()
+				+ ", getType()=" + getType() + ", getName()=" + getName() + ", getInfoLink()=" + getInfoLink()
+				+ ", getNotes()=" + getNotes() + "]";
 	}
+	
 
     
 }

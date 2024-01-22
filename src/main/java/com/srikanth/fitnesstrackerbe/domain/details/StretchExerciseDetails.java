@@ -27,7 +27,9 @@ public class StretchExerciseDetails  extends ExerciseDetails {
 	}
 	@Override
 	public String toString() {
-		return "StretchExerciseDetails [duration=" + duration + ", difficulty=" + difficulty + "]";
+		return "StretchExerciseDetails [duration=" + duration + ", difficulty=" + difficulty + ", toString()="
+				+ super.toString() + "]";
 	}
+
     
 }
