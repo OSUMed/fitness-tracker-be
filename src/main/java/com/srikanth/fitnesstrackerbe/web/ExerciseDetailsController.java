@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.srikanth.fitnesstrackerbe.domain.details.ExerciseDetails;
-import com.srikanth.fitnesstrackerbe.service.ExerciseDetailsService;
+import com.srikanth.fitnesstrackerbe.service.details.ExerciseDetailsService;
 
 @RestController
 @CrossOrigin(origins = "*")
