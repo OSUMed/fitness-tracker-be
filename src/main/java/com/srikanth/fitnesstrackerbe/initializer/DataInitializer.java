@@ -58,16 +58,16 @@ public class DataInitializer implements CommandLineRunner {
 	}
 
 	private void addStrengthWorkouts() {
-		strengthRepository.save(new StrengthExerciseDetails("Strength", "Bench Press",
+		strengthRepository.save(new StrengthExerciseDetails("strength", "Bench Press",
 				"https://example.com/strength/benchpress", "Flat bench barbell press, 3 sets of 10 reps", "Chest"));
-		strengthRepository.save(new StrengthExerciseDetails("Strength", "Deadlift",
+		strengthRepository.save(new StrengthExerciseDetails("strength", "Deadlift",
 				"https://example.com/strength/deadlift", "Traditional barbell deadlift, 4 sets of 6 reps", "Back"));
 	}
 
 	private void addCardioWorkouts() {
-		cardioRepository.save(new CardioExerciseDetails("Cardio", "Running", "https://example.com/cardio/running",
+		cardioRepository.save(new CardioExerciseDetails("cardio", "Running", "https://example.com/cardio/running",
 				"Outdoor running at a steady pace", 30, 5));
-		cardioRepository.save(new CardioExerciseDetails("Cardio", "Cycling", "https://example.com/cardio/cycling",
+		cardioRepository.save(new CardioExerciseDetails("cardio", "Cycling", "https://example.com/cardio/cycling",
 				"Stationary bike cycling", 45, 15));
 	}
 
