@@ -27,9 +27,17 @@ public class ExerciseDetailsService {
 		}
 	}
 
-	public ExerciseDetails putExerciseDetail(ExerciseDetails exerciseDetail) {
-		// TODO Auto-generated method stub
-		return null;
+	public ExerciseDetails putExerciseDetail(ExerciseDetails exerciseDetail, Long exerciseDetailId) {
+		try {
+			if (exerciseDetail.getId() != null && exerciseDetailsRepository.existsById(exerciseDetailId)) {
+			
+				return exerciseDetailsRepository.save(exerciseDetail);
+			} else {
+				throw new RuntimeException("Exercise detail not found with id: " + exerciseDetail.getId());
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to update exercise detail", e);
+		}
 	}
 
 	public void deleteExerciseDetail(Long exerciseDetailId) {

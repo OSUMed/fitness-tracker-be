@@ -1,6 +1,7 @@
 package com.srikanth.fitnesstrackerbe.web;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -60,33 +61,51 @@ public class ExerciseDetailsController {
 	}
 
 	@PostMapping("/")
-	public ResponseEntity<List<ExerciseDetails>> createExerciseDetails(@RequestBody String exerciseDetailJson) {
-		try {
-	       // Deserialize the JSON string into ExerciseDetails
-			System.out.println("pre jackson ExerciseDetails: " + exerciseDetailJson);
+	public ResponseEntity<List<ExerciseDetails>> createExerciseDetails(@RequestBody Map<String, Object> requestBody) {
+	    try {
+	        System.out.println("postExerciseDetails requestBody: " + requestBody);
+	        
+	        @SuppressWarnings("unchecked")
+	        Map<String, Object> newExerciseMap = (Map<String, Object>) requestBody.get("newExercise");
 	        ObjectMapper objectMapper = new ObjectMapper();
-	        ExerciseDetails exerciseDetail = objectMapper.readValue(exerciseDetailJson, ExerciseDetails.class);
+	        ExerciseDetails exerciseDetail = objectMapper.convertValue(newExerciseMap, ExerciseDetails.class);
 
-	        System.out.println("post jackson ExerciseDetails: " + exerciseDetail);
-//			ExerciseDetails savedExerciseDetail = exerciseDetailsService.postExerciseDetail(exerciseDetail);
-//			System.out.println("createExerciseDetails weeklyPlan: " + savedExerciseDetail);
-			return ResponseEntity.ok(exerciseDetailsService.returnAllDetails());
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-		}
+	        String exerciseType = (String) requestBody.get("exerciseType");
+	        exerciseDetail.setType(exerciseType);  // Set explicitly because Jackson bug
+
+	        ExerciseDetails savedExerciseDetail = exerciseDetailsService.postExerciseDetail(exerciseDetail);
+	        System.out.println("postExerciseDetails result: " + savedExerciseDetail);
+
+	        return ResponseEntity.ok(exerciseDetailsService.returnAllDetails());
+	    } catch (Exception e) {
+	        e.printStackTrace();  
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+	    }
 	}
+
 
 	@PutMapping("/{exerciseDetailId}")
-	public ResponseEntity<List<ExerciseDetails>> putExerciseDetails(@PathVariable Long exerciseDetailId, @RequestBody ExerciseDetails exerciseDetail) {
-		try {
-			System.out.println("putExerciseDetails: " + exerciseDetail);
-			ExerciseDetails savedExerciseDetail = exerciseDetailsService.putExerciseDetail(exerciseDetail);
-			System.out.println("createExerciseDetails weeklyPlan: " + savedExerciseDetail);
-			return ResponseEntity.ok(exerciseDetailsService.returnAllDetails());
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-		}
+	public ResponseEntity<List<ExerciseDetails>> putExerciseDetails(
+	        @PathVariable Long exerciseDetailId,
+	        @RequestBody Map<String, Object> requestBody) {
+	    try {
+	        String exerciseType = (String) requestBody.get("type");
+
+	        // Request Body has the mapping:
+	        ObjectMapper objectMapper = new ObjectMapper();
+	        ExerciseDetails exerciseDetail = objectMapper.convertValue(requestBody, ExerciseDetails.class);
+	        exerciseDetail.setType(exerciseType);	// work around for jackson bug
+	        ExerciseDetails savedExerciseDetail = exerciseDetailsService.putExerciseDetail(exerciseDetail, exerciseDetailId);
+	        System.out.println("putExerciseDetails result: " + savedExerciseDetail);
+
+	        return ResponseEntity.ok(exerciseDetailsService.returnAllDetails());
+	    } catch (Exception e) {
+	        // Log the exception for debugging
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+	    }
 	}
+
 
 	@DeleteMapping("/{exerciseDetailId}")
 	public ResponseEntity<List<ExerciseDetails>> deleteExerciseDetails(@PathVariable Long exerciseDetailId) {
