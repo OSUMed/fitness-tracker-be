@@ -85,10 +85,10 @@ public class TodaysWorkoutTableService {
 
 		// Change it to DTO
 		if (databaseTodaysWorkout.isPresent()) {
-			todaysWorkoutDTO = exerciseService.convertDomainToDTO(databaseTodaysWorkout.get());
+			todaysWorkoutDTO = exerciseService.extractExercisesAndConvertToExerciseDTO(databaseTodaysWorkout.get());
 		}
 
-		System.out.println("Finished TodaysWorkoutDTO: " + databaseTodaysWorkout);
+		System.out.println("Finished TodaysWorkoutDTO: " + todaysWorkoutDTO);
 		// Return DTO
 		return todaysWorkoutDTO;
 	}
@@ -134,21 +134,22 @@ public class TodaysWorkoutTableService {
 		}
 	}
 
-	public TodaysWorkoutDTO processTodaysWorkoutUpdateData(Map<String, Object> fullExerciseData, Integer userId) {
+	public TodaysWorkoutDTO processTodaysWorkoutUpdateData(Map<String, Object> fullExerciseData, Integer userId, Integer exerciseId) {
 		// Make Data to Exercise:
 		ExerciseDTO exerciseDTO = exerciseService.convertDataToExerciseDTO(fullExerciseData);
 		System.out.println(
-				"UPDATE final exerciseDTO: " + exerciseDTO + " exerciseDTO's userId: " + exerciseDTO.getUserId());
+				"processTodaysWorkoutUpdateData final exerciseDTO: " + exerciseDTO + " exerciseDTO's userId: " + exerciseDTO.getUserId());
 		Exercise exerciseWithNewData = exerciseService.convertExerciseDTOToExercise(exerciseDTO);
 		System.out.println("UPDATE exercise domain: " + exerciseWithNewData);
 
 		java.util.Date todayDate = new java.util.Date();
 		java.sql.Date sqlDate = new java.sql.Date(todayDate.getTime());
+//		return new TodaysWorkoutDTO();
 
 		// Get Saved Exercise data to update:
 		System.out.println("User Id is: " + userId);
 		Optional<TodaysWorkout> existingWorkout = todaysWorkoutRepository.findByUserIdAndDate(userId, sqlDate);
-		TodaysWorkout todaysWorkout=null;
+		TodaysWorkout todaysWorkout = null;
 		if (existingWorkout.isPresent()) {
 			todaysWorkout = existingWorkout.get();
 		}
@@ -158,33 +159,45 @@ public class TodaysWorkoutTableService {
 //		exercise.setWorkout(todaysWorkout);
 //		todaysWorkout.getExercises().add(exercise);
 		// Update data:
-		TodaysWorkout updatedTodaysWorkout = updateExerciseInTodaysWorkout(exerciseWithNewData, todaysWorkout);
-		System.out.println("processTodaysWorkoutUpdateData: Item being saved to repo is: " + updatedTodaysWorkout);
+		TodaysWorkout updatedTodaysWorkout = updateExerciseInTodaysWorkout(exerciseWithNewData, todaysWorkout, exerciseId);
+		System.out.println("processTodaysWorkoutUpdateData: domain->repo: " + updatedTodaysWorkout);
 		TodaysWorkout savedTodaysWorkout = todaysWorkoutRepository.save(updatedTodaysWorkout);
-	  // Convert to DTO and return
-	    return returnTodaysWorkoutData(savedTodaysWorkout);
+		// Convert to DTO and return
+		return returnTodaysWorkoutData(savedTodaysWorkout);
 	}
 
-	private TodaysWorkout updateExerciseInTodaysWorkout(Exercise exerciseWithNewData, TodaysWorkout todaysWorkout) {
+	private TodaysWorkout updateExerciseInTodaysWorkout(Exercise exerciseWithNewData, TodaysWorkout todaysWorkout, Integer exerciseId) {
 	    List<Exercise> todaysExercises = todaysWorkout.getExercises();
+	    Long exerciseIdLong = Long.valueOf(exerciseId);
+	    System.out.println("-----updateExerciseInTodaysWorkout-----");
+	    System.out.println("REPO todaysExercises: " + todaysWorkout + exerciseIdLong);
+
 	    Exercise exerciseToUpdate = todaysExercises.stream()
-	            .filter(exercise -> exercise.getId().equals(exerciseWithNewData.getId()))
+	            .peek(exercise -> System.out.println("Checking exercise with ID: " + exercise.getId()))
+	            .filter(exercise -> {
+	                System.out.println("Comparing " + exercise.getId() + " with " + exerciseId);
+	                return exercise.getId().equals(exerciseIdLong);
+	            })
 	            .findFirst()
 	            .orElse(null);
 
+	    System.out.println("Exercise found in updateExerciseInTodaysWorkout: " + exerciseToUpdate);
+	    
 	    if (exerciseToUpdate != null) {
-	        System.out.println("Exercise found in updateExerciseInTodaysWorkout: " + exerciseToUpdate);
-	        exerciseToUpdate.setExerciseDetail(exerciseWithNewData.getExerciseDetail());
 	        exerciseToUpdate.setExerciseName(exerciseWithNewData.getExerciseName());
 	        exerciseToUpdate.setType(exerciseWithNewData.getType());
+//	        exerciseToUpdate.setSets(exerciseWithNewData.getSets());
 	        String exerciseType = exerciseToUpdate.getType();
+	        System.out.println("The type is: " + exerciseType);
 	        updateExerciseSets(exerciseToUpdate, exerciseWithNewData, exerciseType);
 	    } else {
-	        System.out.println("No exercise found to update.");
+	        System.out.println("No exercise found with ID: " + exerciseId);
 	    }
 
+	    System.out.println("FINISH updateExerciseInTodaysWorkout: " + todaysWorkout);
 	    return todaysWorkout;
 	}
+
 
 
 	private void updateExerciseSets(Exercise exerciseToUpdate, Exercise exerciseWithUpdatedData, String exerciseType) {

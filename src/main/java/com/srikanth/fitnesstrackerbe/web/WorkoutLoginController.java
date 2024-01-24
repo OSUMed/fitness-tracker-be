@@ -79,7 +79,7 @@ public class WorkoutLoginController {
 				TodaysWorkout savedTodaysWorkout = savedTodaysWorkoutOpt.get();
 				TodaysWorkoutDTO todaysWorkoutDTO = todaysWorkoutTableService
 						.returnTodaysWorkoutData(savedTodaysWorkout);
-				System.out.println("In GET todays workout: " + todaysWorkoutDTO);
+				System.out.println("@GetMapping-workoutlogins: " + todaysWorkoutDTO);
 				return ResponseEntity.ok(todaysWorkoutDTO);
 			} else {
 				System.out.println("No Today Records Found or not Present?");
@@ -88,7 +88,7 @@ public class WorkoutLoginController {
 			}
 		} else {
 			System.out.println("REJECTED @GetMapping(workoutlogins): ");
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 		}
 	}
 
@@ -109,7 +109,7 @@ public class WorkoutLoginController {
 			TodaysWorkout savedTodaysWorkout = todaysWorkoutTableService.processTodaysWorkoutData(workoutData);
 			TodaysWorkoutDTO todaysWorkoutDTO = todaysWorkoutTableService.returnTodaysWorkoutData(savedTodaysWorkout);
 
-			System.out.println("Client Sent DTO: " + todaysWorkoutDTO);
+			System.out.println("@PostMapping-workoutlogins DTO: " + todaysWorkoutDTO);
 			return ResponseEntity.ok(todaysWorkoutDTO);
 //        return ResponseEntity.ok(new TodaysWorkout());
 		} else {
@@ -141,7 +141,7 @@ public class WorkoutLoginController {
 			}
 		} else {
 			System.out.println("Authentication failed for delete request.");
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // Not authenticated or authorized
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); // Not authenticated or authorized
 		}
 	}
 
@@ -151,6 +151,11 @@ public class WorkoutLoginController {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
 		if (authentication != null && authentication.isAuthenticated()) {
+			System.out.println("------------in @PutMapping(workoutlogins)------------");
+			System.out.println("workoutData: " + workoutData);
+			System.out.println("exerciseId): " + exerciseId);
+			System.out.println("----------------------------");
+//			return ResponseEntity.ok(new TodaysWorkoutDTO());
 			try {
 				String userName = authentication.getName();
 				User loggedInUser = (User) userService.loadUserByUsername(userName);
@@ -158,8 +163,8 @@ public class WorkoutLoginController {
 
 				// Make data into the updated DTO and return it:
 				TodaysWorkoutDTO updatedExerciseDTO = todaysWorkoutTableService
-						.processTodaysWorkoutUpdateData(workoutData, userId);
-				System.out.println("UPDATE DTO result is: " + updatedExerciseDTO);
+						.processTodaysWorkoutUpdateData(workoutData, userId, exerciseId);
+				System.out.println("@PutMapping-workoutlogins repo -> DTO for client: " + updatedExerciseDTO);
 				return ResponseEntity.ok(updatedExerciseDTO);
 
 			} catch (NoWorkoutFoundException | ExerciseNotFoundException e) {
@@ -168,7 +173,7 @@ public class WorkoutLoginController {
 			}
 		} else {
 			System.out.println("Authentication failed for delete request.");
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // Not authenticated or authorized
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); 
 		}
 
 	}
