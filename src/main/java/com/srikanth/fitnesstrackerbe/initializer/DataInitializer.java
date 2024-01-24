@@ -54,22 +54,22 @@ public class DataInitializer implements CommandLineRunner {
 			userRepository.save(guestUser);
 		}
 		
-		Optional<User> guestUser2Opt = userRepository.findByUsername("guest");
+		Optional<User> guestUser2Opt = userRepository.findByUsername("guest2");
 		if (!guestUser2Opt.isPresent()) {
-			User guestUser2 = new User("guest", "guestguest");
+			User guestUser2 = new User("guest2", "guestguest");
 			guestUser2.setAuthorities(new HashSet<>(Collections.singletonList(roleUser)));
 			userRepository.save(guestUser2);
 		}
 		
-		Optional<User> guestUser3Opt = userRepository.findByUsername("guest");
+		Optional<User> guestUser3Opt = userRepository.findByUsername("guest3");
 		if (!guestUser3Opt.isPresent()) {
-			User guestUser3 = new User("guest", "guestguest");
+			User guestUser3 = new User("guest3", "guestguest");
 			guestUser3.setAuthorities(new HashSet<>(Collections.singletonList(roleUser)));
 			userRepository.save(guestUser3);
 		}
-		Optional<User> guestUser4Opt = userRepository.findByUsername("guest");
+		Optional<User> guestUser4Opt = userRepository.findByUsername("guest4");
 		if (!guestUser4Opt.isPresent()) {
-			User guestUser4 = new User("guest", "guestguest");
+			User guestUser4 = new User("guest4", "guestguest");
 			guestUser4.setAuthorities(new HashSet<>(Collections.singletonList(roleUser)));
 			userRepository.save(guestUser4);
 		}
