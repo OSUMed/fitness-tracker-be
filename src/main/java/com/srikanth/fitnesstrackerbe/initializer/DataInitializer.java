@@ -43,15 +43,35 @@ public class DataInitializer implements CommandLineRunner {
 
 		Optional<User> adminUserOpt = userRepository.findByUsername("admin");
 		if (!adminUserOpt.isPresent()) {
-			User adminUser = new User("admin", "encodedPassword");
+			User adminUser = new User("admin", "adminadmin");
 			adminUser.setAuthorities(new HashSet<>(Collections.singletonList(roleAdmin)));
 			userRepository.save(adminUser);
 		}
 		Optional<User> guestUserOpt = userRepository.findByUsername("guest");
 		if (!guestUserOpt.isPresent()) {
-			User adminUser = new User("guest", "guestlogin");
-			adminUser.setAuthorities(new HashSet<>(Collections.singletonList(roleUser)));
-			userRepository.save(adminUser);
+			User guestUser = new User("guest", "guestguest");
+			guestUser.setAuthorities(new HashSet<>(Collections.singletonList(roleUser)));
+			userRepository.save(guestUser);
+		}
+		
+		Optional<User> guestUser2Opt = userRepository.findByUsername("guest");
+		if (!guestUser2Opt.isPresent()) {
+			User guestUser2 = new User("guest", "guestguest");
+			guestUser2.setAuthorities(new HashSet<>(Collections.singletonList(roleUser)));
+			userRepository.save(guestUser2);
+		}
+		
+		Optional<User> guestUser3Opt = userRepository.findByUsername("guest");
+		if (!guestUser3Opt.isPresent()) {
+			User guestUser3 = new User("guest", "guestguest");
+			guestUser3.setAuthorities(new HashSet<>(Collections.singletonList(roleUser)));
+			userRepository.save(guestUser3);
+		}
+		Optional<User> guestUser4Opt = userRepository.findByUsername("guest");
+		if (!guestUser4Opt.isPresent()) {
+			User guestUser4 = new User("guest", "guestguest");
+			guestUser4.setAuthorities(new HashSet<>(Collections.singletonList(roleUser)));
+			userRepository.save(guestUser4);
 		}
 		addStrengthWorkouts();
 		addCardioWorkouts();
