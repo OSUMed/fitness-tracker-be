@@ -9,12 +9,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.srikanth.fitnesstrackerbe.domain.RefreshToken;
 import com.srikanth.fitnesstrackerbe.domain.User;
+import com.srikanth.fitnesstrackerbe.domain.Authority;
 import com.srikanth.fitnesstrackerbe.repository.RefreshTokenRepository;
 import com.srikanth.fitnesstrackerbe.repository.UserRepository;
 import com.srikanth.fitnesstrackerbe.dao.request.RefreshTokenRequest;
@@ -81,20 +85,23 @@ public class UserController {
 
 	@GetMapping("/account")
 	public ResponseEntity<Map<String, Object>> currentUserNameAndId() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication != null && authentication.isAuthenticated()) {
-			String userName = authentication.getName();
-			User loggedInUser = (User) userService.loadUserByUsername(userName);
-			Integer userId = loggedInUser.getId();
-			System.out.println("Who is user? " + userName + userId);
-			Map<String, Object> accountDetails = new HashMap<>();
-			accountDetails.put("username", userName);
-			accountDetails.put("userId", userId);
-			System.out.println("Deets are: " + accountDetails);
-			return ResponseEntity.ok(accountDetails);
-		}
-		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    if (authentication != null && authentication.isAuthenticated()) {
+	        String userName = authentication.getName();
+	        User loggedInUser = (User) userService.loadUserByUsername(userName);
+	        Integer userId = loggedInUser.getId();
+	        Collection<Authority> authorities = loggedInUser.getAuthorities();
+
+	        Map<String, Object> accountDetails = new HashMap<>();
+	        accountDetails.put("username", userName);
+	        accountDetails.put("userId", userId);
+	        accountDetails.put("authorities", authorities.stream().map(Authority::getAuthority).collect(Collectors.toList()));
+
+	        return ResponseEntity.ok(accountDetails);
+	    }
+	    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 	}
+
 
 	@PostMapping("/register")
 	public ResponseEntity<RegisterationResponse> signUpUser(@RequestBody User user) {
