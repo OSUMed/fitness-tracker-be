@@ -19,20 +19,20 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
 	@Autowired
 	private JwtAuthenticationFilter jwtAuthenticationFilter;
-	 private final UserDetailsService userDetailsService;
+	private final UserDetailsService userDetailsService;
 
-    @Autowired
-    public SecurityConfiguration(@Qualifier("userDetailsServiceImpl") UserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }
-    @Autowired
-    private CorsConfigurationSource corsConfigurationSource;
+	@Autowired
+	public SecurityConfiguration(@Qualifier("userDetailsServiceImpl") UserDetailsService userDetailsService) {
+		this.userDetailsService = userDetailsService;
+	}
+
+	@Autowired
+	private CorsConfigurationSource corsConfigurationSource;
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -40,33 +40,30 @@ public class SecurityConfiguration {
 		return new BCryptPasswordEncoder();
 	}
 
-
-
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-	    String[] pathsPermitAll = { "/api/v1/users", "/workouts/**", "/free", "/api/logout", "/actuator/**", "/account", "/allusers", "/refreshtoken", "/tryme", "/api/v1/users/**", "/h2-console/**", "/srikanth", "/register", "/login" };
-	    http    // Apply CORS
-	        .cors(cors -> cors.configurationSource(corsConfigurationSource))
-	    	.csrf(AbstractHttpConfigurer::disable)
-	        .authorizeHttpRequests(authz -> {
-	            for (String path : pathsPermitAll) {
-	                authz.requestMatchers(new AntPathRequestMatcher(path)).permitAll();
-	            }
-	            authz.requestMatchers(new AntPathRequestMatcher("/user/welcome")).authenticated()
-	                 .requestMatchers(new AntPathRequestMatcher("/admin/**")).hasAuthority("ROLE_ADMIN")
-	                 .requestMatchers(new AntPathRequestMatcher("/user/**")).hasAuthority("ROLE_USER")
-	                 .anyRequest().authenticated();
-	        })
-	        .headers(frameOptions -> frameOptions.disable())
-	        .authenticationProvider(authenticationProvider())
-	        .sessionManagement(sessionManagement -> 
-            sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-	        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+		String[] pathsPermitAll = { "/api/v1/users", "/free", "/api/logout", "/actuator/**", "/account", "/allusers",
+				"/refreshtoken", "/tryme", "/api/v1/users/**", "/h2-console/**", "/srikanth", "/register", "/login" };
+		http // Apply CORS
+				.cors(cors -> cors.configurationSource(corsConfigurationSource)).csrf(AbstractHttpConfigurer::disable)
+				.authorizeHttpRequests(authz -> {
+					for (String path : pathsPermitAll) {
+						authz.requestMatchers(new AntPathRequestMatcher(path)).permitAll();
+					}
+					authz.requestMatchers(new AntPathRequestMatcher("/user/welcome")).authenticated()
+							.requestMatchers(new AntPathRequestMatcher("/workouts/**")).authenticated()
+							.requestMatchers(new AntPathRequestMatcher("/weekplan/**")).authenticated()
+							.requestMatchers(new AntPathRequestMatcher("/details/**")).authenticated()
+							.requestMatchers(new AntPathRequestMatcher("/admin/**")).hasAuthority("ROLE_ADMIN")
+							.requestMatchers(new AntPathRequestMatcher("/user/**")).hasAuthority("ROLE_USER")
+							.anyRequest().authenticated();
+				}).headers(frameOptions -> frameOptions.disable()).authenticationProvider(authenticationProvider())
+				.sessionManagement(
+						sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-	    return http.build();
+		return http.build();
 	}
-
-
 
 	@Bean
 	public AuthenticationProvider authenticationProvider() {
