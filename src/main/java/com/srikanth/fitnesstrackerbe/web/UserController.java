@@ -1,5 +1,6 @@
 package com.srikanth.fitnesstrackerbe.web;
 
+import io.github.pixee.security.Newlines;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -143,7 +144,7 @@ public class UserController {
 
 			// Clear refresh token cookie using CookieUtils
 			ResponseCookie refreshTokenCookie = CookieUtils.clearCookie("refreshToken");
-			response.setHeader("Set-Cookie", refreshTokenCookie.toString());
+			response.setHeader("Set-Cookie", Newlines.stripAll(refreshTokenCookie.toString()));
 
 			return ResponseEntity.ok(new LogoutResponse("Successfully logged out"));
 		} else {
