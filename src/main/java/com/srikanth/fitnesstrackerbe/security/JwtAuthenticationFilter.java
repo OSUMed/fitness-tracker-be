@@ -1,5 +1,6 @@
 package com.srikanth.fitnesstrackerbe.security;
 
+import io.github.pixee.security.Newlines;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
@@ -124,7 +125,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter implements App
 			throws IOException {
 		try {
 			String newToken = refreshAccessToken(refreshTokenCookie);
-			response.setHeader("Authorization-Refresh", newToken); // Set new token in response
+			response.setHeader("Authorization-Refresh", Newlines.stripAll(newToken)); // Set new token in response
 			setAuthenticationInContext(jwtService.getSubject(newToken));
 			System.out.println("handleAccessTokenExpiration: new token is- " + newToken);
 		} catch (IllegalArgumentException e2) {
